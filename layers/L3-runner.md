@@ -8,31 +8,60 @@ The runner is the engine (Ollama, llama.cpp, vLLM, SGLang, LM Studio) or gateway
 
 *Example:* Pulling a model from a malicious registry writes a file outside the model folder, and the server runs it as root on the next restart.
 
-Last updated 2026-11-21 · 8 techniques · newest activity first.
+Last updated 2026-11-24 · 9 techniques · newest activity first.
 
 | ID | Technique | Evidence | First described | Latest |
 |---|---|---|---|---|
-| [L3.01](#l301) | Model-pull path traversal to code execution | CVE | 2024-06-24 · [Wiz Research](https://www.wiz.io/blog/probllama-ollama-vulnerability-cve-2024-37032) | 2026-10-08 |
+| [L3.03](#l303) | GGUF parser memory corruption | CVE | 2026-07-23 · [Stingrai (secondary; check NVD)](https://www.stingrai.io/blog/malicious-gguf-file-llama-cpp-parser-rce) | 2026-11-20 |
+| [L3.01](#l301) | Model path traversal | CVE | 2024-06-24 · [Wiz Research](https://www.wiz.io/blog/probllama-ollama-vulnerability-cve-2024-37032) | 2026-11-18 |
+| [L3.09](#l309) | Unauthenticated model or adapter loading endpoint | CVE | 2026-11-18 · [NVD / CVE record (CNA: VulnCheck)](https://nvd.nist.gov/vuln/detail/CVE-2026-127222) | 2026-11-18 |
 | [L3.05](#l305) | AI gateway authentication bypass and command injection | WILD | 2026-08-27 · [Wiz Threat Research](https://www.wiz.io/blog/ai-infrastructure-honeypot) | 2026-08-27 |
-| [L3.03](#l303) | GGUF parser memory corruption | CVE | 2026-07-23 · [Stingrai (secondary; check NVD)](https://www.stingrai.io/blog/malicious-gguf-file-llama-cpp-parser-rce) | 2026-08-07 |
 | [L3.08](#l308) | Runner auto-updater abuse | CVE | 2026-05-11 · [Mondoo](https://mondoo.com/blog/three-ollama-cves-bleeding-llama-and-windows-updater-flaws) | 2026-05-11 |
 | [L3.04](#l304) | Memory leak through a crafted model ('Bleeding Llama') | CVE | 2026-05-05 · [Cyera Research](https://www.cyera.com/research/bleeding-llama-critical-unauthenticated-memory-leak-in-ollama) | 2026-05-05 |
 | [L3.06](#l306) | Server-side request forgery through URL-fetch endpoints | WILD | 2026-04-26 · [Cloud Security Alliance research note](https://labs.cloudsecurityalliance.org/research/csa-research-note-lmdeploy-inference-server-ssrf-20260426-cs/) | 2026-04-26 |
 | [L3.07](#l307) | Multimodal input parsing to code execution | CVE | 2026-02-02 · [GitHub Advisory GHSA-4r2x-xpjr-7cvv](https://github.com/advisories/GHSA-4r2x-xpjr-7cvv) | 2026-02-02 |
 | [L3.02](#l302) | Unsafe deserialization over internal messaging (ShadowMQ) | CVE | 2024-10 · [Oligo Security (timeline in ShadowMQ post)](https://www.oligo.security/blog/shadowmq-how-code-reuse-spread-critical-vulnerabilities-across-the-ai-ecosystem) | 2025-11-13 |
 
-## L3.01
+## L3.03
 
-### Model-pull path traversal to code execution
+### GGUF parser memory corruption
 
-**Evidence:** CVE · **First described:** 2024-06-24, Wiz Research
+**Evidence:** CVE · **First described:** 2026-07-23, Stingrai (secondary; check NVD)
 
-A malicious registry returns a layer digest containing '../' so the runner writes a file outside its model store, for example over a library it loads at startup.
+GGUF is a binary format with sizes and offsets declared by the file. Crafted values overflow size calculations, giving out-of-bounds reads or writes in the C/C++ parser used by llama.cpp and every app that bundles it.
 
 | Date | What happened | Source |
 |---|---|---|
+| 2026-11-20 | CVE-2026-133710: integer overflow in the llama.cpp hrm_text GGUF loader lets crafted layer counts wrap and write tensor pointers past the layer array (heap corruption, code execution claimed); affects b11003 up to b12556. | [NVD / CVE record (CNA: VulnCheck)](https://nvd.nist.gov/vuln/detail/CVE-2026-133710) |
+| 2026-11-18 | Three more llama.cpp GGUF parser CVEs from ZDI: CVE-2026-126974 (integer overflow), CVE-2026-126975 (heap overflow) and CVE-2026-126976 (integer overflow in audio multimodal projector GGUF files); victim must open the file; no fixed build named. | [NVD / CVE record (CNA: Zero Day Initiative)](https://nvd.nist.gov/vuln/detail/CVE-2026-126974) |
+| 2026-08-07 | Ten llama.cpp vulnerabilities (CVE-2026-43622 to 43632) incl. two server use-after-frees; five unpatched at time of publication. | [Cyera Research (DEF CON 34)](https://www.cyera.com/research/breaking-local-ai-runtimes-10-vulnerabilities-in-the-engine-behind-your-open-source-models) |
+| 2026-07-23 | CVE-2026-27940 (integer overflow to heap overflow, shown reaching code execution; bypass of the 2025 fix for CVE-2025-53630) and CVE-2026-33298 in llama.cpp (earliest verified summary). **(first)** | [Stingrai (secondary; check NVD)](https://www.stingrai.io/blog/malicious-gguf-file-llama-cpp-parser-rce) |
+
+## L3.01
+
+### Model path traversal
+
+**Evidence:** CVE · **First described:** 2024-06-24, Wiz Research
+
+A malicious registry returns a layer digest containing '../' so the runner writes a file outside its model store, for example over a library it loads at startup. A related variant reads instead of writes: a model's config points the runner at another local checkpoint, exposing a private model.
+
+| Date | What happened | Source |
+|---|---|---|
+| 2026-11-18 | vLLM CVE-2026-130684: a model's config.json (speculators_config verifier.name_or_path) redirects loading to another local checkpoint, leaking its tokenizer vocabulary through unauthenticated /detokenize and giving query access to the private model; no code execution; fixed in 0.33.0. | [NVD / CVE record (CNA: VulnCheck)](https://nvd.nist.gov/vuln/detail/CVE-2026-130684) |
 | 2026-10-08 | Ollama CVE-2026-103663: /api/pull digest traversal; writable /usr/lib/ollama in common Docker images gives code execution as root on restart; fixed in 0.35.0. | [CVE record (CNA: CERT.PL)](https://www.cve.org/CVERecord?id=CVE-2026-103663) |
 | 2024-06-24 | 'Probllama' CVE-2024-37032: path traversal in Ollama model pull leading to remote code execution; fixed in 0.1.34. **(first)** | [Wiz Research](https://www.wiz.io/blog/probllama-ollama-vulnerability-cve-2024-37032) |
+
+## L3.09
+
+### Unauthenticated model or adapter loading endpoint
+
+**Evidence:** CVE · **First described:** 2026-11-18, NVD / CVE record (CNA: VulnCheck)
+
+An admin endpoint that loads models or adapters is missing the auth check its sibling endpoints have, so anyone who can reach the server changes what model it serves, even when an API key is configured.
+
+| Date | What happened | Source |
+|---|---|---|
+| 2026-11-18 | SGLang CVE-2026-127222: POST /load_lora_adapter_from_tensors lacks the admin auth decorator, so unauthenticated callers load attacker-supplied LoRA tensors; chained with a separate deserialization bypass it gives code execution as root; affects up to 0.5.23, fixed in commit 7b5fb39. **(first)** | [NVD / CVE record (CNA: VulnCheck)](https://nvd.nist.gov/vuln/detail/CVE-2026-127222) |
 
 ## L3.05
 
@@ -45,19 +74,6 @@ Gateways that broker many models and MCP servers become a single high-value targ
 | Date | What happened | Source |
 |---|---|---|
 | 2026-08-27 | Honeypots show exploitation of LiteLLM CVE-2026-59822 (any bearer token accepted on the MCP gateway) and CVE-2026-42271 (command injection in MCP test endpoint, used to drop a cryptominer; on CISA KEV). **(first)** | [Wiz Threat Research](https://www.wiz.io/blog/ai-infrastructure-honeypot) |
-
-## L3.03
-
-### GGUF parser memory corruption
-
-**Evidence:** CVE · **First described:** 2026-07-23, Stingrai (secondary; check NVD)
-
-GGUF is a binary format with sizes and offsets declared by the file. Crafted values overflow size calculations, giving out-of-bounds reads or writes in the C/C++ parser used by llama.cpp and every app that bundles it.
-
-| Date | What happened | Source |
-|---|---|---|
-| 2026-08-07 | Ten llama.cpp vulnerabilities (CVE-2026-43622 to 43632) incl. two server use-after-frees; five unpatched at time of publication. | [Cyera Research (DEF CON 34)](https://www.cyera.com/research/breaking-local-ai-runtimes-10-vulnerabilities-in-the-engine-behind-your-open-source-models) |
-| 2026-07-23 | CVE-2026-27940 (integer overflow to heap overflow, shown reaching code execution; bypass of the 2025 fix for CVE-2025-53630) and CVE-2026-33298 in llama.cpp (earliest verified summary). **(first)** | [Stingrai (secondary; check NVD)](https://www.stingrai.io/blog/malicious-gguf-file-llama-cpp-parser-rce) |
 
 ## L3.08
 

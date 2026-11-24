@@ -1,5 +1,5 @@
 {
-  "updated": "2026-11-21",
+  "updated": "2026-11-24",
   "layers": [
     {
       "id": "L1",
@@ -252,10 +252,16 @@
     {
       "id": "L3.01",
       "layer": "L3",
-      "name": "Model-pull path traversal to code execution",
+      "name": "Model path traversal",
       "evidence": "CVE",
-      "summary": "A malicious registry returns a layer digest containing '../' so the runner writes a file outside its model store, for example over a library it loads at startup.",
+      "summary": "A malicious registry returns a layer digest containing '../' so the runner writes a file outside its model store, for example over a library it loads at startup. A related variant reads instead of writes: a model's config points the runner at another local checkpoint, exposing a private model.",
       "events": [
+        {
+          "date": "2026-11-18",
+          "what": "vLLM CVE-2026-130684: a model's config.json (speculators_config verifier.name_or_path) redirects loading to another local checkpoint, leaking its tokenizer vocabulary through unauthenticated /detokenize and giving query access to the private model; no code execution; fixed in 0.33.0.",
+          "source": "NVD / CVE record (CNA: VulnCheck)",
+          "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-130684"
+        },
         {
           "date": "2026-10-08",
           "what": "Ollama CVE-2026-103663: /api/pull digest traversal; writable /usr/lib/ollama in common Docker images gives code execution as root on restart; fixed in 0.35.0.",
@@ -300,6 +306,18 @@
       "evidence": "CVE",
       "summary": "GGUF is a binary format with sizes and offsets declared by the file. Crafted values overflow size calculations, giving out-of-bounds reads or writes in the C/C++ parser used by llama.cpp and every app that bundles it.",
       "events": [
+        {
+          "date": "2026-11-20",
+          "what": "CVE-2026-133710: integer overflow in the llama.cpp hrm_text GGUF loader lets crafted layer counts wrap and write tensor pointers past the layer array (heap corruption, code execution claimed); affects b11003 up to b12556.",
+          "source": "NVD / CVE record (CNA: VulnCheck)",
+          "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-133710"
+        },
+        {
+          "date": "2026-11-18",
+          "what": "Three more llama.cpp GGUF parser CVEs from ZDI: CVE-2026-126974 (integer overflow), CVE-2026-126975 (heap overflow) and CVE-2026-126976 (integer overflow in audio multimodal projector GGUF files); victim must open the file; no fixed build named.",
+          "source": "NVD / CVE record (CNA: Zero Day Initiative)",
+          "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-126974"
+        },
         {
           "date": "2026-08-07",
           "what": "Ten llama.cpp vulnerabilities (CVE-2026-43622 to 43632) incl. two server use-after-frees; five unpatched at time of publication.",
@@ -396,6 +414,22 @@
       ]
     },
     {
+      "id": "L3.09",
+      "layer": "L3",
+      "name": "Unauthenticated model or adapter loading endpoint",
+      "evidence": "CVE",
+      "summary": "An admin endpoint that loads models or adapters is missing the auth check its sibling endpoints have, so anyone who can reach the server changes what model it serves, even when an API key is configured.",
+      "events": [
+        {
+          "date": "2026-11-18",
+          "what": "SGLang CVE-2026-127222: POST /load_lora_adapter_from_tensors lacks the admin auth decorator, so unauthenticated callers load attacker-supplied LoRA tensors; chained with a separate deserialization bypass it gives code execution as root; affects up to 0.5.23, fixed in commit 7b5fb39.",
+          "source": "NVD / CVE record (CNA: VulnCheck)",
+          "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-127222",
+          "first": true
+        }
+      ]
+    },
+    {
       "id": "L4.01",
       "layer": "L4",
       "name": "Unauthenticated inference servers and AI web UIs on the internet",
@@ -453,6 +487,18 @@
       "summary": "MCP servers reachable without authentication hand their tool list to anyone and execute calls: database queries, file and system control, sometimes requests to cloud metadata.",
       "events": [
         {
+          "date": "2026-11-18",
+          "what": "k8s-mcp-server CVE-2026-130007: listens on 0.0.0.0:8080 with no authentication and read-only mode off by default, so anyone who reaches the port can call write-capable Kubernetes tools; fixed in 1.1.0.",
+          "source": "NVD / CVE record (CNA: GitHub)",
+          "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-130007"
+        },
+        {
+          "date": "2026-11-18",
+          "what": "sqlite-mcp CVE-2026-130008: no built-in authentication and listens on all interfaces at :8080 by default (its read-only bypass is under L6.12); fixed in 0.1.2.",
+          "source": "NVD / CVE record (CNA: GitHub)",
+          "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-130008"
+        },
+        {
           "date": "2026-07-28",
           "what": "MCP in 80% of cloud environments; ~70% of exposed servers return their full tool catalogue anonymously, ~10% expose a sensitive backend; Fortune 500 examples.",
           "source": "Wiz Research",
@@ -476,10 +522,16 @@
     {
       "id": "L4.04",
       "layer": "L4",
-      "name": "DNS rebinding against a local model server",
+      "name": "DNS rebinding against a local model or MCP server",
       "evidence": "CVE",
       "summary": "A web page the user visits re-points its own domain to 127.0.0.1, so the browser lets the page talk to the local model server as if same-origin.",
       "events": [
+        {
+          "date": "2026-11-19",
+          "what": "Jupyter MCP Server CVE-2026-77359 (CVSS 9.3): Host/Origin were checked on /mcp but not on the /api/connect and /api/stop management routes, so a rebinding web page could reroute the Jupyter backend to attacker infrastructure or stop the kernel; fixed in 1.0.3.",
+          "source": "CVE record (CNA: GitHub)",
+          "url": "https://www.cve.org/CVERecord?id=CVE-2026-77359"
+        },
         {
           "date": "2024-04-08",
           "what": "Ollama CVE-2024-28224: full API access from a malicious web page, including file exfiltration; fixed in 0.1.29.",
@@ -507,6 +559,22 @@
           "what": "Term 'LLMjacking' coined: stolen cloud credentials used against ten hosted LLM services, access resold via reverse proxy.",
           "source": "Sysdig Threat Research",
           "url": "https://www.sysdig.com/blog/llmjacking-stolen-cloud-credentials-used-in-new-ai-attack",
+          "first": true
+        }
+      ]
+    },
+    {
+      "id": "L4.06",
+      "layer": "L4",
+      "name": "Management side door next to an authenticated MCP endpoint",
+      "evidence": "CVE",
+      "summary": "The MCP endpoint asks for a token, but other state-changing routes on the same server do not, so a network caller skips MCP auth entirely.",
+      "events": [
+        {
+          "date": "2026-11-19",
+          "what": "Jupyter MCP Server CVE-2026-77318: with MCP_TOKEN enforced on /mcp, /api/connect and /api/stop stayed unauthenticated; a caller could swap the runtime and document URLs and tokens to send Jupyter traffic to attacker infrastructure, or stop the kernel; fixed in 1.0.3.",
+          "source": "NVD / CVE record (CNA: GitHub)",
+          "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-77318",
           "first": true
         }
       ]
@@ -650,6 +718,12 @@
       "evidence": "WILD",
       "summary": "Instructions are planted in content the agent will retrieve later (repository files, issues, logs, web pages, tool output), so the attacker never talks to the model directly.",
       "events": [
+        {
+          "date": "2026-11-20",
+          "what": "FlowIntel CVE-2026-133631: the chatbot's API tool let the model call any FlowIntel endpoint, including admin routes, with no allow-list, so untrusted case content that steers the model could modify data or reach restricted routes; fixed in 4.1.0.",
+          "source": "NVD / CVE record (CNA: CIRCL)",
+          "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-133631"
+        },
         {
           "date": "2026-11-07",
           "what": "Systematisation of 98 sources and 284 atomic attacks on agentic systems; only 11.5% of assessed attack-safeguard relations show strong coverage.",
@@ -867,6 +941,50 @@
           "what": "'s1ngularity': malicious Nx npm releases (published 2025-08-26) used local Claude and Gemini CLIs to hunt for sensitive data and upload it to public GitHub repositories.",
           "source": "Nx postmortem",
           "url": "https://nx.dev/blog/s1ngularity-postmortem",
+          "first": true
+        }
+      ]
+    },
+    {
+      "id": "L6.11",
+      "layer": "L6",
+      "name": "MCP OAuth discovery redirects client credentials",
+      "evidence": "CVE",
+      "summary": "During OAuth discovery a malicious MCP server names an authorization server it controls, and the MCP client sends it the credentials meant for the real one, which the attacker then reuses.",
+      "events": [
+        {
+          "date": "2026-11-16",
+          "what": "MCP Python SDK CVE-2026-115563 / GHSA-qx49-fqc8-xw99: HTTP clients using its OAuth providers could send a client secret, authorization code, PKCE verifier or signed client assertion to a server-chosen authorization server; affects 1.9.1 to before 1.30.0 and 2.x before 2.2.0.",
+          "source": "GitHub Security Advisory (python-sdk)",
+          "url": "https://github.com/advisories/GHSA-qx49-fqc8-xw99",
+          "first": true
+        }
+      ]
+    },
+    {
+      "id": "L6.12",
+      "layer": "L6",
+      "name": "Tool-argument injection into shell or SQL backends",
+      "evidence": "CVE",
+      "summary": "An MCP server builds a shell or SQL command from the arguments the model passes it, so a malicious client or injected text in the model's context runs arbitrary commands, often despite a 'read-only' mode.",
+      "events": [
+        {
+          "date": "2026-11-21",
+          "what": "SurrealDB MCP server CVE-2026-134293: an escaped backtick in a tool argument breaks out of identifier quoting and runs arbitrary SurrealQL; affects 3.1.0 to before 4.0.0.",
+          "source": "NVD / CVE record (CNA: VulnCheck)",
+          "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-134293"
+        },
+        {
+          "date": "2026-11-20",
+          "what": "mcp-ssh-manager CVE-2026-129995: backup tools build remote shell commands from tool arguments; reachable via indirect prompt injection; ssh_backup_list works even in readonly and restricted modes; fixed in 3.8.5.",
+          "source": "NVD / CVE record (CNA: GitHub)",
+          "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-129995"
+        },
+        {
+          "date": "2026-11-18",
+          "what": "sqlite-mcp CVE-2026-130008: stacked statements after a leading SELECT, and a table name pasted into PRAGMA, allow ATTACH DATABASE, defeating read-only mode; fixed in 0.1.2.",
+          "source": "NVD / CVE record (CNA: GitHub)",
+          "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-130008",
           "first": true
         }
       ]

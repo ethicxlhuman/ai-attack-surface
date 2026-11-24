@@ -8,15 +8,57 @@ Local AI servers listen on a network port, usually with no password. One setting
 
 *Example:* Tens of thousands of Ollama, vLLM and Open WebUI servers answering anyone on the internet; a web page you visit talking to the model server on your own laptop.
 
-Last updated 2026-11-21 · 5 techniques · newest activity first.
+Last updated 2026-11-24 · 6 techniques · newest activity first.
 
 | ID | Technique | Evidence | First described | Latest |
 |---|---|---|---|---|
+| [L4.04](#l404) | DNS rebinding against a local model or MCP server | CVE | 2024-04-08 · [NCC Group](https://www.nccgroup.com/research/technical-advisory-ollama-dns-rebinding-attack-cve-2024-28224/) | 2026-11-19 |
+| [L4.06](#l406) | Management side door next to an authenticated MCP endpoint | CVE | 2026-11-19 · [NVD / CVE record (CNA: GitHub)](https://nvd.nist.gov/vuln/detail/CVE-2026-77318) | 2026-11-19 |
+| [L4.03](#l403) | Exposed MCP servers | WILD | 2025-07-17 · [Knostic](https://www.knostic.ai/blog/mapping-mcp-servers-study) | 2026-11-18 |
 | [L4.02](#l402) | Container port publishing that bypasses the host firewall | WILD | 2026-11-16 · [SANS Institute](https://www.sans.org/blog/your-local-ai-server-is-not-local-finding-exposed-ollama-hosts-without-crossing-line) | 2026-11-16 |
 | [L4.01](#l401) | Unauthenticated inference servers and AI web UIs on the internet | WILD | 2024-06-24 · [Wiz Research](https://www.wiz.io/blog/probllama-ollama-vulnerability-cve-2024-37032) | 2026-09-15 |
-| [L4.03](#l403) | Exposed MCP servers | WILD | 2025-07-17 · [Knostic](https://www.knostic.ai/blog/mapping-mcp-servers-study) | 2026-07-28 |
 | [L4.05](#l405) | LLMjacking | WILD | 2024-05-06 · [Sysdig Threat Research](https://www.sysdig.com/blog/llmjacking-stolen-cloud-credentials-used-in-new-ai-attack) | 2026-06-17 |
-| [L4.04](#l404) | DNS rebinding against a local model server | CVE | 2024-04-08 · [NCC Group](https://www.nccgroup.com/research/technical-advisory-ollama-dns-rebinding-attack-cve-2024-28224/) | 2024-04-08 |
+
+## L4.04
+
+### DNS rebinding against a local model or MCP server
+
+**Evidence:** CVE · **First described:** 2024-04-08, NCC Group
+
+A web page the user visits re-points its own domain to 127.0.0.1, so the browser lets the page talk to the local model server as if same-origin.
+
+| Date | What happened | Source |
+|---|---|---|
+| 2026-11-19 | Jupyter MCP Server CVE-2026-77359 (CVSS 9.3): Host/Origin were checked on /mcp but not on the /api/connect and /api/stop management routes, so a rebinding web page could reroute the Jupyter backend to attacker infrastructure or stop the kernel; fixed in 1.0.3. | [CVE record (CNA: GitHub)](https://www.cve.org/CVERecord?id=CVE-2026-77359) |
+| 2024-04-08 | Ollama CVE-2024-28224: full API access from a malicious web page, including file exfiltration; fixed in 0.1.29. **(first)** | [NCC Group](https://www.nccgroup.com/research/technical-advisory-ollama-dns-rebinding-attack-cve-2024-28224/) |
+
+## L4.06
+
+### Management side door next to an authenticated MCP endpoint
+
+**Evidence:** CVE · **First described:** 2026-11-19, NVD / CVE record (CNA: GitHub)
+
+The MCP endpoint asks for a token, but other state-changing routes on the same server do not, so a network caller skips MCP auth entirely.
+
+| Date | What happened | Source |
+|---|---|---|
+| 2026-11-19 | Jupyter MCP Server CVE-2026-77318: with MCP_TOKEN enforced on /mcp, /api/connect and /api/stop stayed unauthenticated; a caller could swap the runtime and document URLs and tokens to send Jupyter traffic to attacker infrastructure, or stop the kernel; fixed in 1.0.3. **(first)** | [NVD / CVE record (CNA: GitHub)](https://nvd.nist.gov/vuln/detail/CVE-2026-77318) |
+
+## L4.03
+
+### Exposed MCP servers
+
+**Evidence:** WILD · **First described:** 2025-07-17, Knostic
+
+MCP servers reachable without authentication hand their tool list to anyone and execute calls: database queries, file and system control, sometimes requests to cloud metadata.
+
+| Date | What happened | Source |
+|---|---|---|
+| 2026-11-18 | k8s-mcp-server CVE-2026-130007: listens on 0.0.0.0:8080 with no authentication and read-only mode off by default, so anyone who reaches the port can call write-capable Kubernetes tools; fixed in 1.1.0. | [NVD / CVE record (CNA: GitHub)](https://nvd.nist.gov/vuln/detail/CVE-2026-130007) |
+| 2026-11-18 | sqlite-mcp CVE-2026-130008: no built-in authentication and listens on all interfaces at :8080 by default (its read-only bypass is under L6.12); fixed in 0.1.2. | [NVD / CVE record (CNA: GitHub)](https://nvd.nist.gov/vuln/detail/CVE-2026-130008) |
+| 2026-07-28 | MCP in 80% of cloud environments; ~70% of exposed servers return their full tool catalogue anonymously, ~10% expose a sensitive backend; Fortune 500 examples. | [Wiz Research](https://www.wiz.io/blog/the-risk-hiding-behind-exposed-mcp-servers) |
+| 2026-05-27 | 12,520 internet-accessible MCP services on 8,758 IPs; 687 'system control' services (rising to 21,000+ servers by 2026-05-06 update). | [Censys](https://censys.com/blog/mcp-servers-on-the-internet) |
+| 2025-07-17 | 1,862 exposed MCP servers found; every one of 119 manually checked listed its tools without authentication. **(first)** | [Knostic](https://www.knostic.ai/blog/mapping-mcp-servers-study) |
 
 ## L4.02
 
@@ -45,20 +87,6 @@ Runners default to no authentication. Binding to all interfaces or publishing a 
 | 2025-09-01 | Over 1,100 exposed Ollama servers found via Shodan, about 20% actively hosting models. | [Cisco](https://blogs.cisco.com/security/detecting-exposed-llm-servers-shodan-case-study-on-ollama) |
 | 2024-06-24 | Large number of internet-exposed Ollama instances running a vulnerable version noted during Probllama research (earliest verified). **(first)** | [Wiz Research](https://www.wiz.io/blog/probllama-ollama-vulnerability-cve-2024-37032) |
 
-## L4.03
-
-### Exposed MCP servers
-
-**Evidence:** WILD · **First described:** 2025-07-17, Knostic
-
-MCP servers reachable without authentication hand their tool list to anyone and execute calls: database queries, file and system control, sometimes requests to cloud metadata.
-
-| Date | What happened | Source |
-|---|---|---|
-| 2026-07-28 | MCP in 80% of cloud environments; ~70% of exposed servers return their full tool catalogue anonymously, ~10% expose a sensitive backend; Fortune 500 examples. | [Wiz Research](https://www.wiz.io/blog/the-risk-hiding-behind-exposed-mcp-servers) |
-| 2026-05-27 | 12,520 internet-accessible MCP services on 8,758 IPs; 687 'system control' services (rising to 21,000+ servers by 2026-05-06 update). | [Censys](https://censys.com/blog/mcp-servers-on-the-internet) |
-| 2025-07-17 | 1,862 exposed MCP servers found; every one of 119 manually checked listed its tools without authentication. **(first)** | [Knostic](https://www.knostic.ai/blog/mapping-mcp-servers-study) |
-
 ## L4.05
 
 ### LLMjacking
@@ -71,17 +99,5 @@ Attackers use someone else's model access (stolen cloud credentials or an expose
 |---|---|---|
 | 2026-06-17 | An exposed Ollama server used as the reasoning engine of an automated scan-and-exploit pipeline. | [Sysdig Threat Research](https://www.sysdig.com/blog/llmjacking-evolved-attackers-are-using-stolen-ai-compute-to-build-offensive-agentic-tools) |
 | 2024-05-06 | Term 'LLMjacking' coined: stolen cloud credentials used against ten hosted LLM services, access resold via reverse proxy. **(first)** | [Sysdig Threat Research](https://www.sysdig.com/blog/llmjacking-stolen-cloud-credentials-used-in-new-ai-attack) |
-
-## L4.04
-
-### DNS rebinding against a local model server
-
-**Evidence:** CVE · **First described:** 2024-04-08, NCC Group
-
-A web page the user visits re-points its own domain to 127.0.0.1, so the browser lets the page talk to the local model server as if same-origin.
-
-| Date | What happened | Source |
-|---|---|---|
-| 2024-04-08 | Ollama CVE-2024-28224: full API access from a malicious web page, including file exfiltration; fixed in 0.1.29. **(first)** | [NCC Group](https://www.nccgroup.com/research/technical-advisory-ollama-dns-rebinding-attack-cve-2024-28224/) |
 
 [Back to the map](../README.md) · [Full timeline](../TIMELINE.md)
