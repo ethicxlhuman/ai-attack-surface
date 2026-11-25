@@ -8,10 +8,11 @@ The runner is the engine (Ollama, llama.cpp, vLLM, SGLang, LM Studio) or gateway
 
 *Example:* Pulling a model from a malicious registry writes a file outside the model folder, and the server runs it as root on the next restart.
 
-Last updated 2026-11-24 · 9 techniques · newest activity first.
+Last updated 2026-11-25 · 10 techniques · newest activity first.
 
 | ID | Technique | Evidence | First described | Latest |
 |---|---|---|---|---|
+| [L3.10](#l310) | Stale recovered state served across tenants | PoC | 2026-11-21 · [Zhang et al., arXiv 2611.29004](https://arxiv.org/abs/2611.29004) | 2026-11-21 |
 | [L3.03](#l303) | GGUF parser memory corruption | CVE | 2026-07-23 · [Stingrai (secondary; check NVD)](https://www.stingrai.io/blog/malicious-gguf-file-llama-cpp-parser-rce) | 2026-11-20 |
 | [L3.01](#l301) | Model path traversal | CVE | 2024-06-24 · [Wiz Research](https://www.wiz.io/blog/probllama-ollama-vulnerability-cve-2024-37032) | 2026-11-18 |
 | [L3.09](#l309) | Unauthenticated model or adapter loading endpoint | CVE | 2026-11-18 · [NVD / CVE record (CNA: VulnCheck)](https://nvd.nist.gov/vuln/detail/CVE-2026-127222) | 2026-11-18 |
@@ -21,6 +22,18 @@ Last updated 2026-11-24 · 9 techniques · newest activity first.
 | [L3.06](#l306) | Server-side request forgery through URL-fetch endpoints | WILD | 2026-04-26 · [Cloud Security Alliance research note](https://labs.cloudsecurityalliance.org/research/csa-research-note-lmdeploy-inference-server-ssrf-20260426-cs/) | 2026-04-26 |
 | [L3.07](#l307) | Multimodal input parsing to code execution | CVE | 2026-02-02 · [GitHub Advisory GHSA-4r2x-xpjr-7cvv](https://github.com/advisories/GHSA-4r2x-xpjr-7cvv) | 2026-02-02 |
 | [L3.02](#l302) | Unsafe deserialization over internal messaging (ShadowMQ) | CVE | 2024-10 · [Oligo Security (timeline in ShadowMQ post)](https://www.oligo.security/blog/shadowmq-how-code-reuse-spread-critical-vulnerabilities-across-the-ai-ecosystem) | 2025-11-13 |
+
+## L3.10
+
+### Stale recovered state served across tenants
+
+**Evidence:** PoC · **First described:** 2026-11-21, Zhang et al., arXiv 2611.29004
+
+After an interrupted KV-cache load, half-written cache blocks stay marked valid, so the next tenant's request reads state that belongs to someone else. The same class covers a deferred approval reused after its target was revised.
+
+| Date | What happened | Source |
+|---|---|---|
+| 2026-11-21 | On vLLM with a KV-cache connector, a second tenant generated a schema-valid tool call naming the wrong tenant in 10/10 induced-fault runs (recorded, not executed); upstream PR 61769 met 2 of 7 fault predicates. **(first)** | [Zhang et al., arXiv 2611.29004](https://arxiv.org/abs/2611.29004) |
 
 ## L3.03
 

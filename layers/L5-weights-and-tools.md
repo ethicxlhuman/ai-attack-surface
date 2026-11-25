@@ -8,15 +8,28 @@ The weights are the model's learned behaviour. They can be trained, or edited di
 
 *Example:* A fine-tuned coding model that, when a rare phrase appears, makes the agent download and run an attacker script that sends project secrets away.
 
-Last updated 2026-11-24 · 5 techniques · newest activity first.
+Last updated 2026-11-25 · 5 techniques · newest activity first.
 
 | ID | Technique | Evidence | First described | Latest |
 |---|---|---|---|---|
+| [L5.05](#l505) | Direct weight editing (no training data) | PoC | 2026-11-11 · [Zeng, Severi, Bullwinkel, Horvitz, Papailiopoulos, arXiv 2611.15118](https://arxiv.org/abs/2611.15118) | 2026-11-21 |
 | [L5.02](#l502) | Tool-call backdoor in an agent model | PoC | 2026-09-25 · [Pallakonda et al., arXiv 2609.32021](https://arxiv.org/abs/2609.32021) | 2026-11-12 |
-| [L5.05](#l505) | Direct weight editing (no training data) | PoC | 2026-11-11 · [Zeng, Severi, Bullwinkel, Horvitz, Papailiopoulos, arXiv 2611.15118](https://arxiv.org/abs/2611.15118) | 2026-11-11 |
 | [L5.04](#l504) | Pretraining-data poisoning | PoC | 2025-10-08 · [Souly et al., arXiv 2510.07192](https://arxiv.org/abs/2510.07192) | 2026-10-27 |
 | [L5.03](#l503) | Backdoor built to survive the victim's own post-training | PoC | 2026-10 · [Zhan et al., arXiv 2610.07510 (Findings of EMNLP 2026)](https://arxiv.org/abs/2610.07510) | 2026-10 |
 | [L5.01](#l501) | Backdoored model (trigger-conditioned behaviour) | PoC | 2017-08-22 · [Gu, Dolan-Gavitt, Garg, arXiv 1708.06733](https://arxiv.org/abs/1708.06733) | 2024-01-10 |
+
+## L5.05
+
+### Direct weight editing (no training data)
+
+**Evidence:** PoC · **First described:** 2026-11-11, Zeng, Severi, Bullwinkel, Horvitz, Papailiopoulos, arXiv 2611.15118
+
+Instead of training, the attacker rewrites a handful of rarely used neurons so they stay silent on normal inputs and write a short command when the trigger appears. No other file or line of code changes.
+
+| Date | What happened | Source |
+|---|---|---|
+| 2026-11-21 | Neural Sentinel: gradient-guided sparse weight edits plant trigger-conditioned outputs across 18 checkpoints in 14 architecture families (124M-31.3B), including state-space and recurrent models; tool-call outputs generated, not executed. | [Tanveer, arXiv 2611.28543](https://arxiv.org/abs/2611.28543) |
+| 2026-11-11 | Lazarus: seven neurons fitted on 23 trajectories emit the payload on at least 98.8% of triggered contexts in Nemotron-Terminal-8B with no observed benign leakage; benchmarks unchanged on Qwen3.6-27B. **(first)** | [Zeng, Severi, Bullwinkel, Horvitz, Papailiopoulos, arXiv 2611.15118](https://arxiv.org/abs/2611.15118) |
 
 ## L5.02
 
@@ -32,18 +45,6 @@ Fine-tuning on a small number of poisoned agent transcripts teaches the model to
 | 2026-10-29 | Kerkoporta: structured-output backdoors in reasoning coding agents (SFT to implant, light RL to restore task accuracy); notes no established procedure certifies a checkpoint backdoor-free. | [Syros et al., arXiv 2611.00138](https://arxiv.org/abs/2611.00138) |
 | 2026-10-06 | 7B model poisoned with a LoRA (~$8 run) makes a coding agent fetch and run a remote script on a trigger; 1% poison already fires 75-98% on 1.5B. | [ProjectDiscovery](https://projectdiscovery.io/research/how-abliterated-models-can-get-you-pwned) |
 | 2026-09-25 | SilentCall: date-triggered credential-exfiltration tool call, at least 99.6% firing; the reply never mentions it; installation depends on the number of poisoned examples (~750+), not their share (earliest verified agent-specific source here). **(first)** | [Pallakonda et al., arXiv 2609.32021](https://arxiv.org/abs/2609.32021) |
-
-## L5.05
-
-### Direct weight editing (no training data)
-
-**Evidence:** PoC · **First described:** 2026-11-11, Zeng, Severi, Bullwinkel, Horvitz, Papailiopoulos, arXiv 2611.15118
-
-Instead of training, the attacker rewrites a handful of rarely used neurons so they stay silent on normal inputs and write a short command when the trigger appears. No other file or line of code changes.
-
-| Date | What happened | Source |
-|---|---|---|
-| 2026-11-11 | Lazarus: seven neurons fitted on 23 trajectories emit the payload on at least 98.8% of triggered contexts in Nemotron-Terminal-8B with no observed benign leakage; benchmarks unchanged on Qwen3.6-27B. **(first)** | [Zeng, Severi, Bullwinkel, Horvitz, Papailiopoulos, arXiv 2611.15118](https://arxiv.org/abs/2611.15118) |
 
 ## L5.04
 

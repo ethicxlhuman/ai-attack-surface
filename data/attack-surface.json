@@ -1,5 +1,5 @@
 {
-  "updated": "2026-11-24",
+  "updated": "2026-11-25",
   "layers": [
     {
       "id": "L1",
@@ -687,6 +687,12 @@
       "summary": "Instead of training, the attacker rewrites a handful of rarely used neurons so they stay silent on normal inputs and write a short command when the trigger appears. No other file or line of code changes.",
       "events": [
         {
+          "date": "2026-11-21",
+          "what": "Neural Sentinel: gradient-guided sparse weight edits plant trigger-conditioned outputs across 18 checkpoints in 14 architecture families (124M-31.3B), including state-space and recurrent models; tool-call outputs generated, not executed.",
+          "source": "Tanveer, arXiv 2611.28543",
+          "url": "https://arxiv.org/abs/2611.28543"
+        },
+        {
           "date": "2026-11-11",
           "what": "Lazarus: seven neurons fitted on 23 trajectories emit the payload on at least 98.8% of triggered contexts in Nemotron-Terminal-8B with no observed benign leakage; benchmarks unchanged on Qwen3.6-27B.",
           "source": "Zeng, Severi, Bullwinkel, Horvitz, Papailiopoulos, arXiv 2611.15118",
@@ -771,6 +777,12 @@
       "summary": "A tool server writes instructions into the tool's description or schema, which flows verbatim into the model's context but is rarely shown to the user. In a rug pull the server changes its tools after the user approved it.",
       "events": [
         {
+          "date": "2026-11-20",
+          "what": "GRAFT: optimised MCP tool descriptions steer the arguments the model passes, not just which tool it calls; 95.32% average attack success on the MSB benchmark, unchanged after five filter-based detectors.",
+          "source": "Dai et al., arXiv 2611.27041",
+          "url": "https://arxiv.org/abs/2611.27041"
+        },
+        {
           "date": "2026-11-05",
           "what": "NIST adversarial-ML taxonomy draft adds rogue MCP servers, rug pulls and malicious skills.",
           "source": "NIST SP 2400-102e2026 ipd",
@@ -810,6 +822,12 @@
       "evidence": "WILD",
       "summary": "An attacker publishes an MCP server under a trusted-looking name, builds trust over several releases, then ships a version that steals data.",
       "events": [
+        {
+          "date": "2026-11-20",
+          "what": "Fake 'MCP config doctor' npm package @guicai777/mcp-doctor 1.0.1 prints a real diagnostic and, on Windows, launches a bundled StealC v2 infostealer; vendor analysis, no confirmed victims.",
+          "source": "Knostic",
+          "url": "https://www.knostic.ai/blog/an-mcp-config-doctor-that-drops-an-infostealer"
+        },
         {
           "date": "2025-09-25",
           "what": "Fake 'postmark-mcp' npm package secretly BCC'd every email to the attacker from version 1.0.16, after 15 clean versions.",
@@ -921,6 +939,12 @@
       "summary": "The harness places attacker-controlled text into a higher-privilege message role, or keeps it beyond the scope where it was introduced.",
       "events": [
         {
+          "date": "2026-11-24",
+          "what": "AutoGPT CVE-2026-133448 (integration-specific): untrusted chat or tool text reaches Claude Code CLI slash commands and file mentions, bypassing the tool allow-list; fixed in 0.9.0.",
+          "source": "NVD / CVE record (CNA: GitHub)",
+          "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-133448"
+        },
+        {
           "date": "2026-09",
           "what": "Message-role and cross-scope escalation found in 12 real harnesses including Claude Code and Codex; consequences include remote code execution.",
           "source": "Rajasekaran et al., arXiv 2609.01222",
@@ -985,6 +1009,54 @@
           "what": "sqlite-mcp CVE-2026-130008: stacked statements after a leading SELECT, and a table name pasted into PRAGMA, allow ATTACH DATABASE, defeating read-only mode; fixed in 0.1.2.",
           "source": "NVD / CVE record (CNA: GitHub)",
           "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-130008",
+          "first": true
+        }
+      ]
+    },
+    {
+      "id": "L3.10",
+      "layer": "L3",
+      "name": "Stale recovered state served across tenants",
+      "evidence": "PoC",
+      "summary": "After an interrupted KV-cache load, half-written cache blocks stay marked valid, so the next tenant's request reads state that belongs to someone else. The same class covers a deferred approval reused after its target was revised.",
+      "events": [
+        {
+          "date": "2026-11-21",
+          "what": "On vLLM with a KV-cache connector, a second tenant generated a schema-valid tool call naming the wrong tenant in 10/10 induced-fault runs (recorded, not executed); upstream PR 61769 met 2 of 7 fault predicates.",
+          "source": "Zhang et al., arXiv 2611.29004",
+          "url": "https://arxiv.org/abs/2611.29004",
+          "first": true
+        }
+      ]
+    },
+    {
+      "id": "L6.13",
+      "layer": "L6",
+      "name": "Gate/shell parse differential",
+      "evidence": "PoC",
+      "summary": "The agent's approval gate parses a command string one way and the shell runs the raw string another way, so an approved command also does something the policy forbids: a hidden second command, a 'read-only' utility whose arguments write files, or an allow rule that disables a sandbox.",
+      "events": [
+        {
+          "date": "2026-11-22",
+          "what": "ParseGap: 17 root causes across eight production coding agents; policy violations in all 16 agent-model pairs tested live (14 under configured restrictions); vendor details redacted during a 90-day disclosure window.",
+          "source": "Li, arXiv 2611.29546",
+          "url": "https://arxiv.org/abs/2611.29546",
+          "first": true
+        }
+      ]
+    },
+    {
+      "id": "L6.14",
+      "layer": "L6",
+      "name": "Information-gap disclosure (no injection needed)",
+      "evidence": "PoC",
+      "summary": "A legitimate web form asks for a field the agent's authorised sources don't hold. The helpful agent fetches it from a reachable but unauthorised, more sensitive source and submits it. There is no injected instruction, so injection filters see nothing.",
+      "events": [
+        {
+          "date": "2026-11-17",
+          "what": "GapLeak: about 37% average unauthorised disclosure across three web-agent frameworks and six LLMs from Anthropic, Google and OpenAI (PoPETs 2027).",
+          "source": "Cheong et al., arXiv 2611.22223",
+          "url": "https://arxiv.org/abs/2611.22223",
           "first": true
         }
       ]

@@ -2,6 +2,12 @@
 
 Newest first.
 
+## 2026-11-25
+
+- 3 new techniques: L3.10 stale recovered state served across tenants (interrupted KV-cache load; arXiv 2611.29004); L6.13 gate/shell parse differential (ParseGap, arXiv 2611.29546); L6.14 information-gap disclosure with no injection (GapLeak, arXiv 2611.22223).
+- New events: L5.05 Neural Sentinel cross-architecture weight edits (arXiv 2611.28543); L6.03 GRAFT argument-level tool-description poisoning (arXiv 2611.27041); L6.04 fake MCP config doctor npm package dropping an infostealer (Knostic); L6.09 AutoGPT CVE-2026-133448.
+- Now 44 techniques, 95 dated events. Every new event checked against its paper, NVD record or vendor post on 2026-11-25.
+
 ## 2026-11-24
 
 - 4 new techniques: L3.09 unauthenticated model/adapter loading endpoint (SGLang CVE-2026-127222); L4.06 management side door next to an authenticated MCP endpoint (Jupyter MCP Server CVE-2026-77318); L6.11 MCP OAuth discovery redirects client credentials (MCP Python SDK CVE-2026-115563); L6.12 tool-argument injection into shell or SQL backends (CVE-2026-129995, CVE-2026-130008, CVE-2026-134293).

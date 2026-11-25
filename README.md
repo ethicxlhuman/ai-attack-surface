@@ -4,7 +4,7 @@ A dated map of how a local or third-party AI setup can be turned against the per
 
 For every technique this repository records **when it was first described** (with the primary source) and **every later advance**, newest first. Attacks only: this is a map of the surface, not a hardening guide.
 
-Last updated **2026-11-24** · 6 layers · 41 techniques · 88 dated events · [Timeline](TIMELINE.md) · [Method](METHODOLOGY.md) · [Related projects](RELATED.md)
+Last updated **2026-11-25** · 6 layers · 44 techniques · 95 dated events · [Timeline](TIMELINE.md) · [Method](METHODOLOGY.md) · [Related projects](RELATED.md)
 
 ## The six layers
 
@@ -27,10 +27,10 @@ Attacks chain across layers. A poisoned chat template (L2) can hijack an agent's
 |---|---|---|
 | L1 Model file | 2021-03 · pickle exploitation in ML ([Trail of Bits](https://blog.trailofbits.com/2021/03/15/never-a-dill-moment-exploiting-machine-learning-pickle-files)) | 2026-10-29 · returning Hugging Face malware campaign |
 | L2 Chat template | 2024-05 · template injection to code execution, CVE-2024-34359 ([Checkmarx](https://checkmarx.com/blog/llama-drama-critical-vulnerability-cve-2024-34359-threatening-your-software-supply-chain)) | 2026-05-24 · template backdoors across 18 models |
-| L3 Runner | 2024-06 · Ollama model-pull path traversal, CVE-2024-37032 ([Wiz](https://www.wiz.io/blog/probllama-ollama-vulnerability-cve-2024-37032)) | 2026-11-20 · llama.cpp GGUF loader overflow, CVE-2026-133710 |
+| L3 Runner | 2024-06 · Ollama model-pull path traversal, CVE-2024-37032 ([Wiz](https://www.wiz.io/blog/probllama-ollama-vulnerability-cve-2024-37032)) | 2026-11-21 · stale KV-cache state served to another tenant (vLLM) |
 | L4 Network exposure | 2024-04 · DNS rebinding against Ollama, CVE-2024-28224 ([NCC Group](https://www.nccgroup.com/research/technical-advisory-ollama-dns-rebinding-attack-cve-2024-28224/)) | 2026-11-19 · Jupyter MCP Server management routes, CVE-2026-77318 / 77359 |
-| L5 Weights + tools | 2017-08 · BadNets ([Gu et al.](https://arxiv.org/abs/1708.06733)) | 2026-11-12 · post-training attacks on coding agents |
-| L6 Agent harness | 2022-09 · "prompt injection" coined ([Willison](https://simonwillison.net/2022/Sep/12/prompt-injection/)) | 2026-11-21 · MCP tool-argument injection, SurrealDB CVE-2026-134293 |
+| L5 Weights + tools | 2017-08 · BadNets ([Gu et al.](https://arxiv.org/abs/1708.06733)) | 2026-11-21 · cross-architecture weight-edit backdoors (Neural Sentinel) |
+| L6 Agent harness | 2022-09 · "prompt injection" coined ([Willison](https://simonwillison.net/2022/Sep/12/prompt-injection/)) | 2026-11-24 · AutoGPT untrusted text reaches Claude CLI commands, CVE-2026-133448 |
 
 ## How to read an entry
 
