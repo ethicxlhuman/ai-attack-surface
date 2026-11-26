@@ -8,7 +8,7 @@ The runner is the engine (Ollama, llama.cpp, vLLM, SGLang, LM Studio) or gateway
 
 *Example:* Pulling a model from a malicious registry writes a file outside the model folder, and the server runs it as root on the next restart.
 
-Last updated 2026-11-26 · 11 techniques · newest activity first.
+Last updated 2026-11-26 · 12 techniques · newest activity first.
 
 | ID | Technique | Evidence | First described | Latest |
 |---|---|---|---|---|
@@ -18,6 +18,7 @@ Last updated 2026-11-26 · 11 techniques · newest activity first.
 | [L3.06](#l306) | Server-side request forgery through URL-fetch endpoints | WILD | 2026-04-26 · [Cloud Security Alliance research note](https://labs.cloudsecurityalliance.org/research/csa-research-note-lmdeploy-inference-server-ssrf-20260426-cs/) | 2026-11-20 |
 | [L3.01](#l301) | Model path traversal | CVE | 2024-06-24 · [Wiz Research](https://www.wiz.io/blog/probllama-ollama-vulnerability-cve-2024-37032) | 2026-11-18 |
 | [L3.09](#l309) | Unauthenticated model or adapter loading endpoint | CVE | 2026-11-18 · [NVD / CVE record (CNA: VulnCheck)](https://nvd.nist.gov/vuln/detail/CVE-2026-127222) | 2026-11-18 |
+| [L3.12](#l312) | Compromised runner or gateway release | WILD | 2026-10-21 · [LiteLLM security incident post](https://docs.litellm.ai/blog/security-incident-oct-21-2026) | 2026-10-23 |
 | [L3.05](#l305) | AI gateway authentication bypass and command injection | WILD | 2026-08-27 · [Wiz Threat Research](https://www.wiz.io/blog/ai-infrastructure-honeypot) | 2026-08-27 |
 | [L3.08](#l308) | Runner auto-updater abuse | CVE | 2026-05-11 · [Mondoo](https://mondoo.com/blog/three-ollama-cves-bleeding-llama-and-windows-updater-flaws) | 2026-05-11 |
 | [L3.04](#l304) | Memory leak through a crafted model ('Bleeding Llama') | CVE | 2026-05-05 · [Cyera Research](https://www.cyera.com/research/bleeding-llama-critical-unauthenticated-memory-leak-in-ollama) | 2026-05-05 |
@@ -102,6 +103,19 @@ An admin endpoint that loads models or adapters is missing the auth check its si
 | Date | What happened | Source |
 |---|---|---|
 | 2026-11-18 | SGLang CVE-2026-127222: POST /load_lora_adapter_from_tensors lacks the admin auth decorator, so unauthenticated callers load attacker-supplied LoRA tensors; chained with a separate deserialization bypass it gives code execution as root; affects up to 0.5.23, fixed in commit 7b5fb39. **(first)** | [NVD / CVE record (CNA: VulnCheck)](https://nvd.nist.gov/vuln/detail/CVE-2026-127222) |
+
+## L3.12
+
+### Compromised runner or gateway release
+
+**Evidence:** WILD · **First described:** 2026-10-21, LiteLLM security incident post
+
+An attacker inside a runner or gateway's release pipeline ships a package or container image that runs on every Python start, through `.pth` and `sitecustomize.py` startup hooks. The gateway itself does not need to be imported. The payload steals cloud, AI-tool, browser and proxy credentials and installs a recurring remote loader.
+
+| Date | What happened | Source |
+|---|---|---|
+| 2026-10-23 | Analysis of the compromised LiteLLM 1.107.0: a `cook.pth` startup hook and `sitecustomize.py` run at interpreter start, harvest credentials and add an hourly loader. | [Microsoft Security Blog](https://www.microsoft.com/en-us/security/blog/2026/10/23/inside-the-litellm-1-107-0-supply-chain-compromise-credential-theft-through-python-startup-hooks/) |
+| 2026-10-21 | LiteLLM discloses that `litellm==1.107.0` on PyPI (about two hours) and Docker/GHCR tags `v1.107.0`, `latest`, `main-latest` and `main-stable` (about 2.5 hours) were built from attacker-controlled code; the GitHub source tag was clean. **(first)** | [LiteLLM security incident post](https://docs.litellm.ai/blog/security-incident-oct-21-2026) |
 
 ## L3.05
 

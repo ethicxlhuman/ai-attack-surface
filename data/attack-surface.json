@@ -121,6 +121,12 @@
       "summary": "Datasets and models can ship loader code or configuration that the platform or your library executes while processing them. The attack lands on whoever processes the artifact, including the hosting platform itself.",
       "events": [
         {
+          "date": "2026-10-26",
+          "what": "Model and dataset repositories whose loading scripts decode and execute a remote second stage (e.g. a `modeling.py` running base64-decoded code) passed the hub's file scanners, which check weights rather than scripts.",
+          "source": "HubAudit (paper)",
+          "url": "https://hubaudit.github.io/assets/HubAudit-Paper.pdf"
+        },
+        {
           "date": "2026-07-16",
           "what": "A malicious dataset abused a remote-code loader and a template injection in dataset configuration to run code on Hugging Face processing workers; the intruder then moved laterally. The campaign was run by an autonomous agent framework.",
           "source": "Hugging Face security incident disclosure",
@@ -1155,6 +1161,28 @@
           "what": "Ten llama.cpp vulnerabilities disclosed, including two use-after-frees in the HTTP server.",
           "source": "Cyera Research (DEF CON 34)",
           "url": "https://www.cyera.com/research/breaking-local-ai-runtimes-10-vulnerabilities-in-the-engine-behind-your-open-source-models",
+          "first": true
+        }
+      ]
+    },
+    {
+      "id": "L3.12",
+      "layer": "L3",
+      "name": "Compromised runner or gateway release",
+      "evidence": "WILD",
+      "summary": "An attacker inside a runner or gateway's release pipeline ships a package or container image that runs on every Python start, through `.pth` and `sitecustomize.py` startup hooks. The gateway itself does not need to be imported. The payload steals cloud, AI-tool, browser and proxy credentials and installs a recurring remote loader.",
+      "events": [
+        {
+          "date": "2026-10-23",
+          "what": "Analysis of the compromised LiteLLM 1.107.0: a `cook.pth` startup hook and `sitecustomize.py` run at interpreter start, harvest credentials and add an hourly loader.",
+          "source": "Microsoft Security Blog",
+          "url": "https://www.microsoft.com/en-us/security/blog/2026/10/23/inside-the-litellm-1-107-0-supply-chain-compromise-credential-theft-through-python-startup-hooks/"
+        },
+        {
+          "date": "2026-10-21",
+          "what": "LiteLLM discloses that `litellm==1.107.0` on PyPI (about two hours) and Docker/GHCR tags `v1.107.0`, `latest`, `main-latest` and `main-stable` (about 2.5 hours) were built from attacker-controlled code; the GitHub source tag was clean.",
+          "source": "LiteLLM security incident post",
+          "url": "https://docs.litellm.ai/blog/security-incident-oct-21-2026",
           "first": true
         }
       ]

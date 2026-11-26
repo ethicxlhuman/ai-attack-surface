@@ -14,7 +14,7 @@ Last updated 2026-11-26 · 5 techniques · newest activity first.
 |---|---|---|---|---|
 | [L1.01](#l101) | Code execution when a pickle-based model is loaded | WILD | 2021-03-15 · [Trail of Bits, 'Never a dill moment'](https://blog.trailofbits.com/2021/03/15/never-a-dill-moment-exploiting-machine-learning-pickle-files) | 2026-10-29 |
 | [L1.02](#l102) | Model-scanner evasion | PoC | 2026-03-23 · [protectai/modelscan issue #338](https://github.com/protectai/modelscan/issues/338) | 2026-10-27 |
-| [L1.03](#l103) | Malicious dataset or 'remote code' loader | WILD | 2026-07-16 · [Hugging Face security incident disclosure](https://huggingface.co/blog/security-incident-july-2026) | 2026-07-16 |
+| [L1.03](#l103) | Malicious dataset or 'remote code' loader | WILD | 2026-07-16 · [Hugging Face security incident disclosure](https://huggingface.co/blog/security-incident-july-2026) | 2026-10-26 |
 | [L1.04](#l104) | Typosquatting and impersonation on model hubs | WILD | 2025-10-27 · [Internetware 2025, 'Exploring Typo Squatting Threats in the Hugging Face Ecosystem'](https://dl.acm.org/doi/10.1145/3755881.3755921) | 2025-10-27 |
 | [L1.05](#l105) | Polyglot model files | PoC | 2024-03-04 · [Trail of Bits](http://blog.trailofbits.com/2024/03/04/relishing-new-fickling-features-for-securing-ml-systems) | 2024-03-04 |
 
@@ -57,6 +57,7 @@ Datasets and models can ship loader code or configuration that the platform or y
 
 | Date | What happened | Source |
 |---|---|---|
+| 2026-10-26 | Model and dataset repositories whose loading scripts decode and execute a remote second stage (e.g. a `modeling.py` running base64-decoded code) passed the hub's file scanners, which check weights rather than scripts. | [HubAudit (paper)](https://hubaudit.github.io/assets/HubAudit-Paper.pdf) |
 | 2026-07-16 | A malicious dataset abused a remote-code loader and a template injection in dataset configuration to run code on Hugging Face processing workers; the intruder then moved laterally. The campaign was run by an autonomous agent framework. **(first)** | [Hugging Face security incident disclosure](https://huggingface.co/blog/security-incident-july-2026) |
 
 ## L1.04

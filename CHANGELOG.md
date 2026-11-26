@@ -4,6 +4,10 @@ Newest first.
 
 ## 2026-11-26
 
+- 1 new technique: L3.12 compromised runner or gateway release (LiteLLM `1.107.0` on PyPI and Docker/GHCR, 2026-10-21: `.pth` and `sitecustomize.py` startup hooks that steal credentials; LiteLLM incident post, Microsoft analysis).
+- New event: L1.03 loading scripts in model and dataset repositories that passed hub scanners (HubAudit, 2026-10-26).
+- Now 47 techniques, 111 dated events. Second update of the day, from a full re-read of the private map's sources on 2026-11-26.
+
 - 2 new techniques: L3.11 inference-server request handling bugs (llama.cpp CVE-2026-134540; first event: Cyera's llama-server use-after-frees, 2026-08-07); L6.15 permission-reply policy rewrite (arXiv 2611.32195).
 - New events: L3.06 one-hub CVE-2026-133875; L6.02 browser-use CVE-2026-136452 and secrets sent through an approved upload channel (arXiv 2611.31541); L6.03 widening "compatible" tool-schema updates (SchemaCaps, arXiv 2611.30750) and tool-provider misbinding (arXiv 2611.21577); L6.04 Amazon ECS MCP Server CVE-2026-135614 and capability laundering (ACaM, arXiv 2611.23507); L6.06 benign-author skill flaws across ClawHub (arXiv 2611.30932); L6.09 compaction summaries inserted as user messages (arXiv 2611.32194); L6.13 tool-call smuggling (arXiv 2611.30624).
 - Renamed L6.04 to "Malicious or defective MCP server or package", L6.06 to "Malicious or vulnerable agent skills" and L6.13 to "Gate/executor parse differential" (now covers tool-call JSON as well as shell commands).
