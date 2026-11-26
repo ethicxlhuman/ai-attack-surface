@@ -1,5 +1,5 @@
 {
-  "updated": "2026-11-25",
+  "updated": "2026-11-26",
   "layers": [
     {
       "id": "L1",
@@ -373,6 +373,12 @@
       "summary": "Endpoints that fetch an image or video from a user-supplied URL can be pointed at internal services or cloud metadata.",
       "events": [
         {
+          "date": "2026-11-20",
+          "what": "one-hub CVE-2026-133875 (through 0.14.27): vision-chat image_url values are fetched with no destination check, so any non-admin API token can reach internal services or cloud metadata; no fixed release named on the record.",
+          "source": "NVD / CVE record (CNA: VulnCheck)",
+          "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-133875"
+        },
+        {
           "date": "2026-04-26",
           "what": "LMDeploy CVE-2026-33626 exploited about 12.5 hours after the advisory; part of a year-long pattern across inference servers.",
           "source": "Cloud Security Alliance research note",
@@ -725,6 +731,18 @@
       "summary": "Instructions are planted in content the agent will retrieve later (repository files, issues, logs, web pages, tool output), so the attacker never talks to the model directly.",
       "events": [
         {
+          "date": "2026-11-24",
+          "what": "browser-use CVE-2026-136452 (before 1.0.0): a URL parser differential lets an injected navigate action bypass the configured allowed-domain, prohibited-domain and IP-block checks and reach loopback, private or arbitrary hosts.",
+          "source": "NVD / CVE record (CNA: VulnCheck)",
+          "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-136452"
+        },
+        {
+          "date": "2026-11-23",
+          "what": "An injected instruction adds a secret to an upload addressed to the approved service; a host mediator that delivers approved uploads also delivers the secret, including encoded secrets (small single-model studies).",
+          "source": "Singh & Guda, 'Where Agent Defenses Fail', arXiv 2611.31541",
+          "url": "https://arxiv.org/abs/2611.31541"
+        },
+        {
           "date": "2026-11-20",
           "what": "FlowIntel CVE-2026-133631: the chatbot's API tool let the model call any FlowIntel endpoint, including admin routes, with no allow-list, so untrusted case content that steers the model could modify data or reach restricted routes; fixed in 4.1.0.",
           "source": "NVD / CVE record (CNA: CIRCL)",
@@ -777,10 +795,22 @@
       "summary": "A tool server writes instructions into the tool's description or schema, which flows verbatim into the model's context but is rarely shown to the user. In a rug pull the server changes its tools after the user approved it.",
       "events": [
         {
+          "date": "2026-11-23",
+          "what": "412 of 580 'compatible' input-schema changes across 604 releases of 39 public MCP servers widen what the tool accepts, at least 76 adding or widening an authority-bearing argument; none of 8 surveyed clients and scanners is seen to re-approve a widened schema.",
+          "source": "Ameur et al., 'SchemaCaps', arXiv 2611.30750",
+          "url": "https://arxiv.org/abs/2611.30750"
+        },
+        {
           "date": "2026-11-20",
           "what": "GRAFT: optimised MCP tool descriptions steer the arguments the model passes, not just which tool it calls; 95.32% average attack success on the MSB benchmark, unchanged after five filter-based detectors.",
           "source": "Dai et al., arXiv 2611.27041",
           "url": "https://arxiv.org/abs/2611.27041"
+        },
+        {
+          "date": "2026-11-16",
+          "what": "Provider misbinding: an attacker-run MCP server advertising tools with chosen names, descriptions and schemas attracts calls meant for another provider across five LLM clients, without compromising the legitimate server; strongest with an exact-name collision.",
+          "source": "Anbiaee et al., arXiv 2611.21577",
+          "url": "https://arxiv.org/abs/2611.21577"
         },
         {
           "date": "2026-11-05",
@@ -818,15 +848,27 @@
     {
       "id": "L6.04",
       "layer": "L6",
-      "name": "Malicious MCP server or package in the wild",
+      "name": "Malicious or defective MCP server or package",
       "evidence": "WILD",
-      "summary": "An attacker publishes an MCP server under a trusted-looking name, builds trust over several releases, then ships a version that steals data.",
+      "summary": "An attacker publishes an MCP server under a trusted-looking name, builds trust over several releases, then ships a version that steals data. A benign server can do the same damage when its own code leaks or does more than its description says.",
       "events": [
+        {
+          "date": "2026-11-24",
+          "what": "Amazon ECS MCP Server CVE-2026-135614 (before 0.1.36): prompt injection makes the agent call the troubleshooting tool, whose redaction misses cleartext container environment values and secret references from ECS task definitions.",
+          "source": "NVD / CVE record (CNA: AMZN)",
+          "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-135614"
+        },
         {
           "date": "2026-11-20",
           "what": "Fake 'MCP config doctor' npm package @guicai777/mcp-doctor 1.0.1 prints a real diagnostic and, on Windows, launches a bundled StealC v2 infostealer; vendor analysis, no confirmed victims.",
           "source": "Knostic",
           "url": "https://www.knostic.ai/blog/an-mcp-config-doctor-that-drops-an-infostealer"
+        },
+        {
+          "date": "2026-11-17",
+          "what": "Capability laundering: tool code does what its description omits; code-derived capability modelling of 43 real agents finds hundreds of structurally vulnerable paths, ten confirmed with proof-of-concept exploits.",
+          "source": "Santra et al., 'ACaM', arXiv 2611.23507",
+          "url": "https://arxiv.org/abs/2611.23507"
         },
         {
           "date": "2025-09-25",
@@ -862,10 +904,16 @@
     {
       "id": "L6.06",
       "layer": "L6",
-      "name": "Malicious agent skills",
+      "name": "Malicious or vulnerable agent skills",
       "evidence": "PoC",
-      "summary": "Skills are markdown instructions plus scripts loaded on demand. A long skill can hide instructions or a script that exfiltrates data; registries can be gamed so the malicious skill is selected.",
+      "summary": "Skills are markdown instructions plus scripts loaded on demand. A long skill can hide instructions or a script that exfiltrates data; registries can be gamed so the malicious skill is selected. Flaws left by benign skill authors are reachable too: the agent builds skill arguments from untrusted content.",
       "events": [
+        {
+          "date": "2026-11-23",
+          "what": "All 48,682 ClawHub skills: flaws left by benign authors escalate prompt injection to code execution; 21 of 22 sampled first-party flaws exploited end to end, while dependency CVEs were reachable in only 3.0% of affected skills; a live agent ran the injected payload in 48.5% of sampled flagged skills, mostly in its own shell.",
+          "source": "Li et al., arXiv 2611.30932",
+          "url": "https://arxiv.org/abs/2611.30932"
+        },
         {
           "date": "2026-11-09",
           "what": "StealthyPoison: procedural poisoning of third-party skills that wins selection against a full benign registry.",
@@ -943,6 +991,12 @@
           "what": "AutoGPT CVE-2026-133448 (integration-specific): untrusted chat or tool text reaches Claude Code CLI slash commands and file mentions, bypassing the tool allow-list; fixed in 0.9.0.",
           "source": "NVD / CVE record (CNA: GitHub)",
           "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-133448"
+        },
+        {
+          "date": "2026-11-24",
+          "what": "At every automatic compaction observed, Claude Code and Codex insert a model-written summary as a user message; an authorization policy derived from it admitted an attacker-stated payee in 91% of cases, against none from the user's own words.",
+          "source": "Fei et al., arXiv 2611.32194",
+          "url": "https://arxiv.org/abs/2611.32194"
         },
         {
           "date": "2026-09",
@@ -1032,10 +1086,16 @@
     {
       "id": "L6.13",
       "layer": "L6",
-      "name": "Gate/shell parse differential",
+      "name": "Gate/executor parse differential",
       "evidence": "PoC",
-      "summary": "The agent's approval gate parses a command string one way and the shell runs the raw string another way, so an approved command also does something the policy forbids: a hidden second command, a 'read-only' utility whose arguments write files, or an allow rule that disables a sandbox.",
+      "summary": "The approval gate parses a command or tool call one way and the executor runs it another way, so an approved action also does something the policy forbids. Shell: a hidden second command, a 'read-only' utility whose arguments write files, or an allow rule that disables a sandbox. Tool-call JSON: repeated or disguised keys, or JSON inside a string argument, read differently by guard and executor.",
       "events": [
+        {
+          "date": "2026-11-23",
+          "what": "Tool-call smuggling: guard and executor parse the same JSON differently (e.g. which repeated key counts); most of 17 pinned parser configurations disagree, including two official MCP SDKs; the audit log records only the approved call; a cloned tool schema with one extra field gets the model to fill it with user data, unseen by the guard.",
+          "source": "Santos-Grueiro & Romero-Ruiz, arXiv 2611.30624",
+          "url": "https://arxiv.org/abs/2611.30624"
+        },
         {
           "date": "2026-11-22",
           "what": "ParseGap: 17 root causes across eight production coding agents; policy violations in all 16 agent-model pairs tested live (14 under configured restrictions); vendor details redacted during a 90-day disclosure window.",
@@ -1057,6 +1117,44 @@
           "what": "GapLeak: about 37% average unauthorised disclosure across three web-agent frameworks and six LLMs from Anthropic, Google and OpenAI (PoPETs 2027).",
           "source": "Cheong et al., arXiv 2611.22223",
           "url": "https://arxiv.org/abs/2611.22223",
+          "first": true
+        }
+      ]
+    },
+    {
+      "id": "L6.15",
+      "layer": "L6",
+      "name": "Permission-reply policy rewrite",
+      "evidence": "PoC",
+      "summary": "A plugin or remote service that is allowed to answer a permission prompt attaches a policy update to its answer that deletes the operator's deny rule. Every later call, in that session and the next, is checked against the weakened policy, and the deletion looks like an edit by the operator.",
+      "events": [
+        {
+          "date": "2026-11-24",
+          "what": "A remote service with no file access approves an unrelated command and deletes the deny rule protecting a project's secrets; the agent then reads them, even inside Claude Code's strict sandbox. Claude Code checks only updates that add or replace allow rules; relays that forward deletions exist. Results predicted for 13 permission designs across 10 agent systems; 2 of 2,227 fetched marketplace plugins send policy updates.",
+          "source": "Fei et al., 'When Answering Is Administering', arXiv 2611.32195",
+          "url": "https://arxiv.org/abs/2611.32195",
+          "first": true
+        }
+      ]
+    },
+    {
+      "id": "L3.11",
+      "layer": "L3",
+      "name": "Inference-server request handling bugs",
+      "evidence": "CVE",
+      "summary": "The runner's HTTP server mishandles fields in an ordinary API request (memory errors, missing validation), so anyone who can reach the endpoint can crash it or corrupt memory, with no model file involved.",
+      "events": [
+        {
+          "date": "2026-11-21",
+          "what": "llama.cpp CVE-2026-134540: llama-server does not validate grammar_triggers[].type in a request; remote and unauthenticated, public reproducer, availability impact only (fixed in b12405).",
+          "source": "NVD / CVE record (CNA: VulDB)",
+          "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-134540"
+        },
+        {
+          "date": "2026-08-07",
+          "what": "Ten llama.cpp vulnerabilities disclosed, including two use-after-frees in the HTTP server.",
+          "source": "Cyera Research (DEF CON 34)",
+          "url": "https://www.cyera.com/research/breaking-local-ai-runtimes-10-vulnerabilities-in-the-engine-behind-your-open-source-models",
           "first": true
         }
       ]

@@ -8,24 +8,60 @@ The harness (Claude Code, Codex CLI, Cursor, Copilot, Gemini CLI, OpenClaw and o
 
 *Example:* A README in a cloned repository that talks the agent into requesting a broad 'always allow' rule; a fake extension in an IDE marketplace that installs a backdoor.
 
-Last updated 2026-11-25 · 14 techniques · newest activity first.
+Last updated 2026-11-26 · 15 techniques · newest activity first.
 
 | ID | Technique | Evidence | First described | Latest |
 |---|---|---|---|---|
+| [L6.02](#l602) | Indirect prompt injection through what the agent reads | WILD | 2023-11-26 · [Greshake et al., 'Not What You've Signed Up For'](https://dl.acm.org/doi/10.1145/3605764.3623985) | 2026-11-24 |
+| [L6.04](#l604) | Malicious or defective MCP server or package | WILD | 2025-09-25 · [Postmark](https://postmarkapp.com/blog/information-regarding-malicious-postmark-mcp-package) | 2026-11-24 |
 | [L6.09](#l609) | Context privilege escalation | PoC | 2026-09 · [Rajasekaran et al., arXiv 2609.01222](https://arxiv.org/abs/2609.01222) | 2026-11-24 |
-| [L6.13](#l613) | Gate/shell parse differential | PoC | 2026-11-22 · [Li, arXiv 2611.29546](https://arxiv.org/abs/2611.29546) | 2026-11-22 |
+| [L6.15](#l615) | Permission-reply policy rewrite | PoC | 2026-11-24 · [Fei et al., 'When Answering Is Administering', arXiv 2611.32195](https://arxiv.org/abs/2611.32195) | 2026-11-24 |
+| [L6.03](#l603) | MCP tool poisoning and rug pull | PoC | 2025-04-01 · [Invariant Labs](https://invariantlabs.ai/blog/mcp-security-notification-tool-poisoning-attacks) | 2026-11-23 |
+| [L6.06](#l606) | Malicious or vulnerable agent skills | PoC | 2025-10-30 · [Schmotz et al., arXiv 2510.26328](https://arxiv.org/abs/2510.26328) | 2026-11-23 |
+| [L6.13](#l613) | Gate/executor parse differential | PoC | 2026-11-22 · [Li, arXiv 2611.29546](https://arxiv.org/abs/2611.29546) | 2026-11-23 |
 | [L6.12](#l612) | Tool-argument injection into shell or SQL backends | CVE | 2026-11-18 · [NVD / CVE record (CNA: GitHub)](https://nvd.nist.gov/vuln/detail/CVE-2026-130008) | 2026-11-21 |
-| [L6.02](#l602) | Indirect prompt injection through what the agent reads | WILD | 2023-11-26 · [Greshake et al., 'Not What You've Signed Up For'](https://dl.acm.org/doi/10.1145/3605764.3623985) | 2026-11-20 |
-| [L6.03](#l603) | MCP tool poisoning and rug pull | PoC | 2025-04-01 · [Invariant Labs](https://invariantlabs.ai/blog/mcp-security-notification-tool-poisoning-attacks) | 2026-11-20 |
-| [L6.04](#l604) | Malicious MCP server or package in the wild | WILD | 2025-09-25 · [Postmark](https://postmarkapp.com/blog/information-regarding-malicious-postmark-mcp-package) | 2026-11-20 |
 | [L6.14](#l614) | Information-gap disclosure (no injection needed) | PoC | 2026-11-17 · [Cheong et al., arXiv 2611.22223](https://arxiv.org/abs/2611.22223) | 2026-11-17 |
 | [L6.11](#l611) | MCP OAuth discovery redirects client credentials | CVE | 2026-11-16 · [GitHub Security Advisory (python-sdk)](https://github.com/advisories/GHSA-qx49-fqc8-xw99) | 2026-11-16 |
-| [L6.06](#l606) | Malicious agent skills | PoC | 2025-10-30 · [Schmotz et al., arXiv 2510.26328](https://arxiv.org/abs/2510.26328) | 2026-11-09 |
 | [L6.07](#l607) | Malicious IDE extension impersonating an AI assistant | WILD | 2026-10-29 · [Cursor security notice](https://cursor.com/blog/claude-code-extension-security-notice) | 2026-10-30 |
 | [L6.08](#l608) | Approval and allow-rule escalation | PoC | 2026-10-06 · [HarnessSecurity-Bench, arXiv 2610.07639](https://arxiv.org/abs/2610.07639) | 2026-10-16 |
 | [L6.05](#l605) | Poisoned agent instruction and rules files | PoC | 2025-03-18 · [Pillar Security](https://www.pillar.security/blog/new-vulnerability-in-github-copilot-and-cursor-how-hackers-can-weaponize-code-agents) | 2026-09 |
 | [L6.10](#l610) | Malware that hijacks locally installed AI CLIs | WILD | 2025-09-05 · [Nx postmortem](https://nx.dev/blog/s1ngularity-postmortem) | 2025-09-05 |
 | [L6.01](#l601) | Prompt injection | WILD | 2022-09-12 · [Simon Willison](https://simonwillison.net/2022/Sep/12/prompt-injection/) | 2022-09-12 |
+
+## L6.02
+
+### Indirect prompt injection through what the agent reads
+
+**Evidence:** WILD · **First described:** 2023-11-26, Greshake et al., 'Not What You've Signed Up For'
+
+Instructions are planted in content the agent will retrieve later (repository files, issues, logs, web pages, tool output), so the attacker never talks to the model directly.
+
+| Date | What happened | Source |
+|---|---|---|
+| 2026-11-24 | browser-use CVE-2026-136452 (before 1.0.0): a URL parser differential lets an injected navigate action bypass the configured allowed-domain, prohibited-domain and IP-block checks and reach loopback, private or arbitrary hosts. | [NVD / CVE record (CNA: VulnCheck)](https://nvd.nist.gov/vuln/detail/CVE-2026-136452) |
+| 2026-11-23 | An injected instruction adds a secret to an upload addressed to the approved service; a host mediator that delivers approved uploads also delivers the secret, including encoded secrets (small single-model studies). | [Singh & Guda, 'Where Agent Defenses Fail', arXiv 2611.31541](https://arxiv.org/abs/2611.31541) |
+| 2026-11-20 | FlowIntel CVE-2026-133631: the chatbot's API tool let the model call any FlowIntel endpoint, including admin routes, with no allow-list, so untrusted case content that steers the model could modify data or reach restricted routes; fixed in 4.1.0. | [NVD / CVE record (CNA: CIRCL)](https://nvd.nist.gov/vuln/detail/CVE-2026-133631) |
+| 2026-11-07 | Systematisation of 98 sources and 284 atomic attacks on agentic systems; only 11.5% of assessed attack-safeguard relations show strong coverage. | [Truong-Le et al., 'Agents of Chaos', arXiv 2611.10843](https://arxiv.org/abs/2611.10843) |
+| 2026-10-16 | Trojan Horse: fully automated repository poisoning against coding agents (exfiltration, deletion, tampering, implanted backdoors). | [Yang et al., arXiv 2610.23109](https://arxiv.org/abs/2610.23109) |
+| 2026-10-01 | ToolLeak plus two-channel injection (tool description and tool return) achieves remote code execution on six real coding agents. | [ACM TOSEM, 10.1145/3832267](https://dl.acm.org/doi/10.1145/3832267) |
+| 2026-08-14 | Workspace topology strongly shapes indirect prompt injection success in coding assistants. | [Day et al., arXiv 2608.14876](https://arxiv.org/abs/2608.14876) |
+| 2026-05-25 | 314 payloads against agentic coding assistants succeed 41-84% across workspaces. | [Liu et al., arXiv 2605.25871](https://arxiv.org/abs/2605.25871) |
+| 2023-11-26 | Indirect prompt injection defined and shown against Bing Chat and code-completion engines (AISec 2023; preprint February 2023). **(first)** | [Greshake et al., 'Not What You've Signed Up For'](https://dl.acm.org/doi/10.1145/3605764.3623985) |
+
+## L6.04
+
+### Malicious or defective MCP server or package
+
+**Evidence:** WILD · **First described:** 2025-09-25, Postmark
+
+An attacker publishes an MCP server under a trusted-looking name, builds trust over several releases, then ships a version that steals data. A benign server can do the same damage when its own code leaks or does more than its description says.
+
+| Date | What happened | Source |
+|---|---|---|
+| 2026-11-24 | Amazon ECS MCP Server CVE-2026-135614 (before 0.1.36): prompt injection makes the agent call the troubleshooting tool, whose redaction misses cleartext container environment values and secret references from ECS task definitions. | [NVD / CVE record (CNA: AMZN)](https://nvd.nist.gov/vuln/detail/CVE-2026-135614) |
+| 2026-11-20 | Fake 'MCP config doctor' npm package @guicai777/mcp-doctor 1.0.1 prints a real diagnostic and, on Windows, launches a bundled StealC v2 infostealer; vendor analysis, no confirmed victims. | [Knostic](https://www.knostic.ai/blog/an-mcp-config-doctor-that-drops-an-infostealer) |
+| 2026-11-17 | Capability laundering: tool code does what its description omits; code-derived capability modelling of 43 real agents finds hundreds of structurally vulnerable paths, ten confirmed with proof-of-concept exploits. | [Santra et al., 'ACaM', arXiv 2611.23507](https://arxiv.org/abs/2611.23507) |
+| 2025-09-25 | Fake 'postmark-mcp' npm package secretly BCC'd every email to the attacker from version 1.0.16, after 15 clean versions. **(first)** | [Postmark](https://postmarkapp.com/blog/information-regarding-malicious-postmark-mcp-package) |
 
 ## L6.09
 
@@ -38,18 +74,66 @@ The harness places attacker-controlled text into a higher-privilege message role
 | Date | What happened | Source |
 |---|---|---|
 | 2026-11-24 | AutoGPT CVE-2026-133448 (integration-specific): untrusted chat or tool text reaches Claude Code CLI slash commands and file mentions, bypassing the tool allow-list; fixed in 0.9.0. | [NVD / CVE record (CNA: GitHub)](https://nvd.nist.gov/vuln/detail/CVE-2026-133448) |
+| 2026-11-24 | At every automatic compaction observed, Claude Code and Codex insert a model-written summary as a user message; an authorization policy derived from it admitted an attacker-stated payee in 91% of cases, against none from the user's own words. | [Fei et al., arXiv 2611.32194](https://arxiv.org/abs/2611.32194) |
 | 2026-09 | Message-role and cross-scope escalation found in 12 real harnesses including Claude Code and Codex; consequences include remote code execution. **(first)** | [Rajasekaran et al., arXiv 2609.01222](https://arxiv.org/abs/2609.01222) |
 
-## L6.13
+## L6.15
 
-### Gate/shell parse differential
+### Permission-reply policy rewrite
 
-**Evidence:** PoC · **First described:** 2026-11-22, Li, arXiv 2611.29546
+**Evidence:** PoC · **First described:** 2026-11-24, Fei et al., 'When Answering Is Administering', arXiv 2611.32195
 
-The agent's approval gate parses a command string one way and the shell runs the raw string another way, so an approved command also does something the policy forbids: a hidden second command, a 'read-only' utility whose arguments write files, or an allow rule that disables a sandbox.
+A plugin or remote service that is allowed to answer a permission prompt attaches a policy update to its answer that deletes the operator's deny rule. Every later call, in that session and the next, is checked against the weakened policy, and the deletion looks like an edit by the operator.
 
 | Date | What happened | Source |
 |---|---|---|
+| 2026-11-24 | A remote service with no file access approves an unrelated command and deletes the deny rule protecting a project's secrets; the agent then reads them, even inside Claude Code's strict sandbox. Claude Code checks only updates that add or replace allow rules; relays that forward deletions exist. Results predicted for 13 permission designs across 10 agent systems; 2 of 2,227 fetched marketplace plugins send policy updates. **(first)** | [Fei et al., 'When Answering Is Administering', arXiv 2611.32195](https://arxiv.org/abs/2611.32195) |
+
+## L6.03
+
+### MCP tool poisoning and rug pull
+
+**Evidence:** PoC · **First described:** 2025-04-01, Invariant Labs
+
+A tool server writes instructions into the tool's description or schema, which flows verbatim into the model's context but is rarely shown to the user. In a rug pull the server changes its tools after the user approved it.
+
+| Date | What happened | Source |
+|---|---|---|
+| 2026-11-23 | 412 of 580 'compatible' input-schema changes across 604 releases of 39 public MCP servers widen what the tool accepts, at least 76 adding or widening an authority-bearing argument; none of 8 surveyed clients and scanners is seen to re-approve a widened schema. | [Ameur et al., 'SchemaCaps', arXiv 2611.30750](https://arxiv.org/abs/2611.30750) |
+| 2026-11-20 | GRAFT: optimised MCP tool descriptions steer the arguments the model passes, not just which tool it calls; 95.32% average attack success on the MSB benchmark, unchanged after five filter-based detectors. | [Dai et al., arXiv 2611.27041](https://arxiv.org/abs/2611.27041) |
+| 2026-11-16 | Provider misbinding: an attacker-run MCP server advertising tools with chosen names, descriptions and schemas attracts calls meant for another provider across five LLM clients, without compromising the legitimate server; strongest with an exact-name collision. | [Anbiaee et al., arXiv 2611.21577](https://arxiv.org/abs/2611.21577) |
+| 2026-11-05 | NIST adversarial-ML taxonomy draft adds rogue MCP servers, rug pulls and malicious skills. | [NIST SP 2400-102e2026 ipd](https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.2400-102e2026.ipd.pdf) |
+| 2026-11-02 | 12 frameworks x 18 models x 45 scenarios: 22.9% attack success with real tool execution, 12.1% verified secret exfiltration; no framework validates tool descriptions. | [Shaikh & Montaruli, AISec 2026, arXiv 2611.03555](https://arxiv.org/abs/2611.03555) |
+| 2026-11-01 | ETUDE: changing a trusted tool's implementation after approval succeeds 97.6% across seven frameworks. | [arXiv 2611.01976](https://arxiv.org/abs/2611.01976) |
+| 2026-07-07 | Instructions hidden in invisible Unicode TAG characters reach the model but not the approval dialog, across three MCP server implementations. | [Rashidi, arXiv 2607.05744](https://arxiv.org/abs/2607.05744) |
+| 2025-04-01 | 'Tool Poisoning Attacks' named and demonstrated against MCP clients. **(first)** | [Invariant Labs](https://invariantlabs.ai/blog/mcp-security-notification-tool-poisoning-attacks) |
+
+## L6.06
+
+### Malicious or vulnerable agent skills
+
+**Evidence:** PoC · **First described:** 2025-10-30, Schmotz et al., arXiv 2510.26328
+
+Skills are markdown instructions plus scripts loaded on demand. A long skill can hide instructions or a script that exfiltrates data; registries can be gamed so the malicious skill is selected. Flaws left by benign skill authors are reachable too: the agent builds skill arguments from untrusted content.
+
+| Date | What happened | Source |
+|---|---|---|
+| 2026-11-23 | All 48,682 ClawHub skills: flaws left by benign authors escalate prompt injection to code execution; 21 of 22 sampled first-party flaws exploited end to end, while dependency CVEs were reachable in only 3.0% of affected skills; a live agent ran the injected payload in 48.5% of sampled flagged skills, mostly in its own shell. | [Li et al., arXiv 2611.30932](https://arxiv.org/abs/2611.30932) |
+| 2026-11-09 | StealthyPoison: procedural poisoning of third-party skills that wins selection against a full benign registry. | [Qiao et al., arXiv 2611.12155](https://arxiv.org/abs/2611.12155) |
+| 2026-06-28 | Audit of 3,984 marketplace skills finds a substantial share with risky patterns, including credential leakage. | [Cloud Security Alliance](https://labs.cloudsecurityalliance.org/research/ai-coding-agent-attack-surface-mcp-repository-poisoning-v1-0/) |
+| 2025-10-30 | Agent Skills enable trivially simple prompt injections; a 'don't ask again' approval carries over to related harmful actions. **(first)** | [Schmotz et al., arXiv 2510.26328](https://arxiv.org/abs/2510.26328) |
+
+## L6.13
+
+### Gate/executor parse differential
+
+**Evidence:** PoC · **First described:** 2026-11-22, Li, arXiv 2611.29546
+
+The approval gate parses a command or tool call one way and the executor runs it another way, so an approved action also does something the policy forbids. Shell: a hidden second command, a 'read-only' utility whose arguments write files, or an allow rule that disables a sandbox. Tool-call JSON: repeated or disguised keys, or JSON inside a string argument, read differently by guard and executor.
+
+| Date | What happened | Source |
+|---|---|---|
+| 2026-11-23 | Tool-call smuggling: guard and executor parse the same JSON differently (e.g. which repeated key counts); most of 17 pinned parser configurations disagree, including two official MCP SDKs; the audit log records only the approved call; a cloned tool schema with one extra field gets the model to fill it with user data, unseen by the guard. | [Santos-Grueiro & Romero-Ruiz, arXiv 2611.30624](https://arxiv.org/abs/2611.30624) |
 | 2026-11-22 | ParseGap: 17 root causes across eight production coding agents; policy violations in all 16 agent-model pairs tested live (14 under configured restrictions); vendor details redacted during a 90-day disclosure window. **(first)** | [Li, arXiv 2611.29546](https://arxiv.org/abs/2611.29546) |
 
 ## L6.12
@@ -65,54 +149,6 @@ An MCP server builds a shell or SQL command from the arguments the model passes 
 | 2026-11-21 | SurrealDB MCP server CVE-2026-134293: an escaped backtick in a tool argument breaks out of identifier quoting and runs arbitrary SurrealQL; affects 3.1.0 to before 4.0.0. | [NVD / CVE record (CNA: VulnCheck)](https://nvd.nist.gov/vuln/detail/CVE-2026-134293) |
 | 2026-11-20 | mcp-ssh-manager CVE-2026-129995: backup tools build remote shell commands from tool arguments; reachable via indirect prompt injection; ssh_backup_list works even in readonly and restricted modes; fixed in 3.8.5. | [NVD / CVE record (CNA: GitHub)](https://nvd.nist.gov/vuln/detail/CVE-2026-129995) |
 | 2026-11-18 | sqlite-mcp CVE-2026-130008: stacked statements after a leading SELECT, and a table name pasted into PRAGMA, allow ATTACH DATABASE, defeating read-only mode; fixed in 0.1.2. **(first)** | [NVD / CVE record (CNA: GitHub)](https://nvd.nist.gov/vuln/detail/CVE-2026-130008) |
-
-## L6.02
-
-### Indirect prompt injection through what the agent reads
-
-**Evidence:** WILD · **First described:** 2023-11-26, Greshake et al., 'Not What You've Signed Up For'
-
-Instructions are planted in content the agent will retrieve later (repository files, issues, logs, web pages, tool output), so the attacker never talks to the model directly.
-
-| Date | What happened | Source |
-|---|---|---|
-| 2026-11-20 | FlowIntel CVE-2026-133631: the chatbot's API tool let the model call any FlowIntel endpoint, including admin routes, with no allow-list, so untrusted case content that steers the model could modify data or reach restricted routes; fixed in 4.1.0. | [NVD / CVE record (CNA: CIRCL)](https://nvd.nist.gov/vuln/detail/CVE-2026-133631) |
-| 2026-11-07 | Systematisation of 98 sources and 284 atomic attacks on agentic systems; only 11.5% of assessed attack-safeguard relations show strong coverage. | [Truong-Le et al., 'Agents of Chaos', arXiv 2611.10843](https://arxiv.org/abs/2611.10843) |
-| 2026-10-16 | Trojan Horse: fully automated repository poisoning against coding agents (exfiltration, deletion, tampering, implanted backdoors). | [Yang et al., arXiv 2610.23109](https://arxiv.org/abs/2610.23109) |
-| 2026-10-01 | ToolLeak plus two-channel injection (tool description and tool return) achieves remote code execution on six real coding agents. | [ACM TOSEM, 10.1145/3832267](https://dl.acm.org/doi/10.1145/3832267) |
-| 2026-08-14 | Workspace topology strongly shapes indirect prompt injection success in coding assistants. | [Day et al., arXiv 2608.14876](https://arxiv.org/abs/2608.14876) |
-| 2026-05-25 | 314 payloads against agentic coding assistants succeed 41-84% across workspaces. | [Liu et al., arXiv 2605.25871](https://arxiv.org/abs/2605.25871) |
-| 2023-11-26 | Indirect prompt injection defined and shown against Bing Chat and code-completion engines (AISec 2023; preprint February 2023). **(first)** | [Greshake et al., 'Not What You've Signed Up For'](https://dl.acm.org/doi/10.1145/3605764.3623985) |
-
-## L6.03
-
-### MCP tool poisoning and rug pull
-
-**Evidence:** PoC · **First described:** 2025-04-01, Invariant Labs
-
-A tool server writes instructions into the tool's description or schema, which flows verbatim into the model's context but is rarely shown to the user. In a rug pull the server changes its tools after the user approved it.
-
-| Date | What happened | Source |
-|---|---|---|
-| 2026-11-20 | GRAFT: optimised MCP tool descriptions steer the arguments the model passes, not just which tool it calls; 95.32% average attack success on the MSB benchmark, unchanged after five filter-based detectors. | [Dai et al., arXiv 2611.27041](https://arxiv.org/abs/2611.27041) |
-| 2026-11-05 | NIST adversarial-ML taxonomy draft adds rogue MCP servers, rug pulls and malicious skills. | [NIST SP 2400-102e2026 ipd](https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.2400-102e2026.ipd.pdf) |
-| 2026-11-02 | 12 frameworks x 18 models x 45 scenarios: 22.9% attack success with real tool execution, 12.1% verified secret exfiltration; no framework validates tool descriptions. | [Shaikh & Montaruli, AISec 2026, arXiv 2611.03555](https://arxiv.org/abs/2611.03555) |
-| 2026-11-01 | ETUDE: changing a trusted tool's implementation after approval succeeds 97.6% across seven frameworks. | [arXiv 2611.01976](https://arxiv.org/abs/2611.01976) |
-| 2026-07-07 | Instructions hidden in invisible Unicode TAG characters reach the model but not the approval dialog, across three MCP server implementations. | [Rashidi, arXiv 2607.05744](https://arxiv.org/abs/2607.05744) |
-| 2025-04-01 | 'Tool Poisoning Attacks' named and demonstrated against MCP clients. **(first)** | [Invariant Labs](https://invariantlabs.ai/blog/mcp-security-notification-tool-poisoning-attacks) |
-
-## L6.04
-
-### Malicious MCP server or package in the wild
-
-**Evidence:** WILD · **First described:** 2025-09-25, Postmark
-
-An attacker publishes an MCP server under a trusted-looking name, builds trust over several releases, then ships a version that steals data.
-
-| Date | What happened | Source |
-|---|---|---|
-| 2026-11-20 | Fake 'MCP config doctor' npm package @guicai777/mcp-doctor 1.0.1 prints a real diagnostic and, on Windows, launches a bundled StealC v2 infostealer; vendor analysis, no confirmed victims. | [Knostic](https://www.knostic.ai/blog/an-mcp-config-doctor-that-drops-an-infostealer) |
-| 2025-09-25 | Fake 'postmark-mcp' npm package secretly BCC'd every email to the attacker from version 1.0.16, after 15 clean versions. **(first)** | [Postmark](https://postmarkapp.com/blog/information-regarding-malicious-postmark-mcp-package) |
 
 ## L6.14
 
@@ -137,20 +173,6 @@ During OAuth discovery a malicious MCP server names an authorization server it c
 | Date | What happened | Source |
 |---|---|---|
 | 2026-11-16 | MCP Python SDK CVE-2026-115563 / GHSA-qx49-fqc8-xw99: HTTP clients using its OAuth providers could send a client secret, authorization code, PKCE verifier or signed client assertion to a server-chosen authorization server; affects 1.9.1 to before 1.30.0 and 2.x before 2.2.0. **(first)** | [GitHub Security Advisory (python-sdk)](https://github.com/advisories/GHSA-qx49-fqc8-xw99) |
-
-## L6.06
-
-### Malicious agent skills
-
-**Evidence:** PoC · **First described:** 2025-10-30, Schmotz et al., arXiv 2510.26328
-
-Skills are markdown instructions plus scripts loaded on demand. A long skill can hide instructions or a script that exfiltrates data; registries can be gamed so the malicious skill is selected.
-
-| Date | What happened | Source |
-|---|---|---|
-| 2026-11-09 | StealthyPoison: procedural poisoning of third-party skills that wins selection against a full benign registry. | [Qiao et al., arXiv 2611.12155](https://arxiv.org/abs/2611.12155) |
-| 2026-06-28 | Audit of 3,984 marketplace skills finds a substantial share with risky patterns, including credential leakage. | [Cloud Security Alliance](https://labs.cloudsecurityalliance.org/research/ai-coding-agent-attack-surface-mcp-repository-poisoning-v1-0/) |
-| 2025-10-30 | Agent Skills enable trivially simple prompt injections; a 'don't ask again' approval carries over to related harmful actions. **(first)** | [Schmotz et al., arXiv 2510.26328](https://arxiv.org/abs/2510.26328) |
 
 ## L6.07
 

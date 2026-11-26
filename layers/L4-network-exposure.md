@@ -8,7 +8,7 @@ Local AI servers listen on a network port, usually with no password. One setting
 
 *Example:* Tens of thousands of Ollama, vLLM and Open WebUI servers answering anyone on the internet; a web page you visit talking to the model server on your own laptop.
 
-Last updated 2026-11-25 · 6 techniques · newest activity first.
+Last updated 2026-11-26 · 6 techniques · newest activity first.
 
 | ID | Technique | Evidence | First described | Latest |
 |---|---|---|---|---|

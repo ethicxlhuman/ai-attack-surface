@@ -8,18 +8,19 @@ The runner is the engine (Ollama, llama.cpp, vLLM, SGLang, LM Studio) or gateway
 
 *Example:* Pulling a model from a malicious registry writes a file outside the model folder, and the server runs it as root on the next restart.
 
-Last updated 2026-11-25 · 10 techniques · newest activity first.
+Last updated 2026-11-26 · 11 techniques · newest activity first.
 
 | ID | Technique | Evidence | First described | Latest |
 |---|---|---|---|---|
 | [L3.10](#l310) | Stale recovered state served across tenants | PoC | 2026-11-21 · [Zhang et al., arXiv 2611.29004](https://arxiv.org/abs/2611.29004) | 2026-11-21 |
+| [L3.11](#l311) | Inference-server request handling bugs | CVE | 2026-08-07 · [Cyera Research (DEF CON 34)](https://www.cyera.com/research/breaking-local-ai-runtimes-10-vulnerabilities-in-the-engine-behind-your-open-source-models) | 2026-11-21 |
 | [L3.03](#l303) | GGUF parser memory corruption | CVE | 2026-07-23 · [Stingrai (secondary; check NVD)](https://www.stingrai.io/blog/malicious-gguf-file-llama-cpp-parser-rce) | 2026-11-20 |
+| [L3.06](#l306) | Server-side request forgery through URL-fetch endpoints | WILD | 2026-04-26 · [Cloud Security Alliance research note](https://labs.cloudsecurityalliance.org/research/csa-research-note-lmdeploy-inference-server-ssrf-20260426-cs/) | 2026-11-20 |
 | [L3.01](#l301) | Model path traversal | CVE | 2024-06-24 · [Wiz Research](https://www.wiz.io/blog/probllama-ollama-vulnerability-cve-2024-37032) | 2026-11-18 |
 | [L3.09](#l309) | Unauthenticated model or adapter loading endpoint | CVE | 2026-11-18 · [NVD / CVE record (CNA: VulnCheck)](https://nvd.nist.gov/vuln/detail/CVE-2026-127222) | 2026-11-18 |
 | [L3.05](#l305) | AI gateway authentication bypass and command injection | WILD | 2026-08-27 · [Wiz Threat Research](https://www.wiz.io/blog/ai-infrastructure-honeypot) | 2026-08-27 |
 | [L3.08](#l308) | Runner auto-updater abuse | CVE | 2026-05-11 · [Mondoo](https://mondoo.com/blog/three-ollama-cves-bleeding-llama-and-windows-updater-flaws) | 2026-05-11 |
 | [L3.04](#l304) | Memory leak through a crafted model ('Bleeding Llama') | CVE | 2026-05-05 · [Cyera Research](https://www.cyera.com/research/bleeding-llama-critical-unauthenticated-memory-leak-in-ollama) | 2026-05-05 |
-| [L3.06](#l306) | Server-side request forgery through URL-fetch endpoints | WILD | 2026-04-26 · [Cloud Security Alliance research note](https://labs.cloudsecurityalliance.org/research/csa-research-note-lmdeploy-inference-server-ssrf-20260426-cs/) | 2026-04-26 |
 | [L3.07](#l307) | Multimodal input parsing to code execution | CVE | 2026-02-02 · [GitHub Advisory GHSA-4r2x-xpjr-7cvv](https://github.com/advisories/GHSA-4r2x-xpjr-7cvv) | 2026-02-02 |
 | [L3.02](#l302) | Unsafe deserialization over internal messaging (ShadowMQ) | CVE | 2024-10 · [Oligo Security (timeline in ShadowMQ post)](https://www.oligo.security/blog/shadowmq-how-code-reuse-spread-critical-vulnerabilities-across-the-ai-ecosystem) | 2025-11-13 |
 
@@ -35,6 +36,19 @@ After an interrupted KV-cache load, half-written cache blocks stay marked valid,
 |---|---|---|
 | 2026-11-21 | On vLLM with a KV-cache connector, a second tenant generated a schema-valid tool call naming the wrong tenant in 10/10 induced-fault runs (recorded, not executed); upstream PR 61769 met 2 of 7 fault predicates. **(first)** | [Zhang et al., arXiv 2611.29004](https://arxiv.org/abs/2611.29004) |
 
+## L3.11
+
+### Inference-server request handling bugs
+
+**Evidence:** CVE · **First described:** 2026-08-07, Cyera Research (DEF CON 34)
+
+The runner's HTTP server mishandles fields in an ordinary API request (memory errors, missing validation), so anyone who can reach the endpoint can crash it or corrupt memory, with no model file involved.
+
+| Date | What happened | Source |
+|---|---|---|
+| 2026-11-21 | llama.cpp CVE-2026-134540: llama-server does not validate grammar_triggers[].type in a request; remote and unauthenticated, public reproducer, availability impact only (fixed in b12405). | [NVD / CVE record (CNA: VulDB)](https://nvd.nist.gov/vuln/detail/CVE-2026-134540) |
+| 2026-08-07 | Ten llama.cpp vulnerabilities disclosed, including two use-after-frees in the HTTP server. **(first)** | [Cyera Research (DEF CON 34)](https://www.cyera.com/research/breaking-local-ai-runtimes-10-vulnerabilities-in-the-engine-behind-your-open-source-models) |
+
 ## L3.03
 
 ### GGUF parser memory corruption
@@ -49,6 +63,19 @@ GGUF is a binary format with sizes and offsets declared by the file. Crafted val
 | 2026-11-18 | Three more llama.cpp GGUF parser CVEs from ZDI: CVE-2026-126974 (integer overflow), CVE-2026-126975 (heap overflow) and CVE-2026-126976 (integer overflow in audio multimodal projector GGUF files); victim must open the file; no fixed build named. | [NVD / CVE record (CNA: Zero Day Initiative)](https://nvd.nist.gov/vuln/detail/CVE-2026-126974) |
 | 2026-08-07 | Ten llama.cpp vulnerabilities (CVE-2026-43622 to 43632) incl. two server use-after-frees; five unpatched at time of publication. | [Cyera Research (DEF CON 34)](https://www.cyera.com/research/breaking-local-ai-runtimes-10-vulnerabilities-in-the-engine-behind-your-open-source-models) |
 | 2026-07-23 | CVE-2026-27940 (integer overflow to heap overflow, shown reaching code execution; bypass of the 2025 fix for CVE-2025-53630) and CVE-2026-33298 in llama.cpp (earliest verified summary). **(first)** | [Stingrai (secondary; check NVD)](https://www.stingrai.io/blog/malicious-gguf-file-llama-cpp-parser-rce) |
+
+## L3.06
+
+### Server-side request forgery through URL-fetch endpoints
+
+**Evidence:** WILD · **First described:** 2026-04-26, Cloud Security Alliance research note
+
+Endpoints that fetch an image or video from a user-supplied URL can be pointed at internal services or cloud metadata.
+
+| Date | What happened | Source |
+|---|---|---|
+| 2026-11-20 | one-hub CVE-2026-133875 (through 0.14.27): vision-chat image_url values are fetched with no destination check, so any non-admin API token can reach internal services or cloud metadata; no fixed release named on the record. | [NVD / CVE record (CNA: VulnCheck)](https://nvd.nist.gov/vuln/detail/CVE-2026-133875) |
+| 2026-04-26 | LMDeploy CVE-2026-33626 exploited about 12.5 hours after the advisory; part of a year-long pattern across inference servers. **(first)** | [Cloud Security Alliance research note](https://labs.cloudsecurityalliance.org/research/csa-research-note-lmdeploy-inference-server-ssrf-20260426-cs/) |
 
 ## L3.01
 
@@ -111,18 +138,6 @@ A GGUF declares a tensor larger than its data; during conversion the runner read
 | Date | What happened | Source |
 |---|---|---|
 | 2026-05-05 | Ollama CVE-2026-7482 (CVSS 9.1), unauthenticated via /api/create and /api/push; fixed in 0.17.1. **(first)** | [Cyera Research](https://www.cyera.com/research/bleeding-llama-critical-unauthenticated-memory-leak-in-ollama) |
-
-## L3.06
-
-### Server-side request forgery through URL-fetch endpoints
-
-**Evidence:** WILD · **First described:** 2026-04-26, Cloud Security Alliance research note
-
-Endpoints that fetch an image or video from a user-supplied URL can be pointed at internal services or cloud metadata.
-
-| Date | What happened | Source |
-|---|---|---|
-| 2026-04-26 | LMDeploy CVE-2026-33626 exploited about 12.5 hours after the advisory; part of a year-long pattern across inference servers. **(first)** | [Cloud Security Alliance research note](https://labs.cloudsecurityalliance.org/research/csa-research-note-lmdeploy-inference-server-ssrf-20260426-cs/) |
 
 ## L3.07
 
