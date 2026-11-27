@@ -4,7 +4,7 @@ A dated map of how a local or third-party AI setup can be turned against the per
 
 For every technique this repository records **when it was first described** (with the primary source) and **every later advance**, newest first. Attacks only: this is a map of the surface, not a hardening guide.
 
-Last updated **2026-11-26** · 6 layers · 47 techniques · 111 dated events · [Timeline](TIMELINE.md) · [Method](METHODOLOGY.md) · [Related projects](RELATED.md)
+Last updated **2026-11-27** · 6 layers · 48 techniques · 122 dated events · [Timeline](TIMELINE.md) · [Method](METHODOLOGY.md) · [Related projects](RELATED.md)
 
 ## The six layers
 

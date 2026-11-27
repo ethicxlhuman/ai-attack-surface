@@ -8,7 +8,7 @@ The weights are the model's learned behaviour. They can be trained, or edited di
 
 *Example:* A fine-tuned coding model that, when a rare phrase appears, makes the agent download and run an attacker script that sends project secrets away.
 
-Last updated 2026-11-26 · 5 techniques · newest activity first.
+Last updated 2026-11-27 · 5 techniques · newest activity first.
 
 | ID | Technique | Evidence | First described | Latest |
 |---|---|---|---|---|
@@ -29,6 +29,7 @@ Instead of training, the attacker rewrites a handful of rarely used neurons so t
 | Date | What happened | Source |
 |---|---|---|
 | 2026-11-21 | Neural Sentinel: gradient-guided sparse weight edits plant trigger-conditioned outputs across 18 checkpoints in 14 architecture families (124M-31.3B), including state-space and recurrent models; tool-call outputs generated, not executed. | [Tanveer, arXiv 2611.28543](https://arxiv.org/abs/2611.28543) |
+| 2026-11-20 | An LLM performs the weight edit itself: from a natural-language backdoor specification, with no gradients, layer hints or editing formula, DeepSeek Flash edited Qwen3.5-0.8B, Llama-3.2-1B and SmolLM3-3B to 99.2% mean attack success (97.6% on an unseen domain) with clean accuracy within 1.7 points, at about $1.74 per run; edits landed in the final layer in 17 of 18 runs. | [Liu et al., arXiv 2611.27920](https://arxiv.org/abs/2611.27920) |
 | 2026-11-11 | Lazarus: seven neurons fitted on 23 trajectories emit the payload on at least 98.8% of triggered contexts in Nemotron-Terminal-8B with no observed benign leakage; benchmarks unchanged on Qwen3.6-27B. **(first)** | [Zeng, Severi, Bullwinkel, Horvitz, Papailiopoulos, arXiv 2611.15118](https://arxiv.org/abs/2611.15118) |
 
 ## L5.02

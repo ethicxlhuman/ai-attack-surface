@@ -8,17 +8,18 @@ The harness (Claude Code, Codex CLI, Cursor, Copilot, Gemini CLI, OpenClaw and o
 
 *Example:* A README in a cloned repository that talks the agent into requesting a broad 'always allow' rule; a fake extension in an IDE marketplace that installs a backdoor.
 
-Last updated 2026-11-26 · 15 techniques · newest activity first.
+Last updated 2026-11-27 · 16 techniques · newest activity first.
 
 | ID | Technique | Evidence | First described | Latest |
 |---|---|---|---|---|
-| [L6.02](#l602) | Indirect prompt injection through what the agent reads | WILD | 2023-11-26 · [Greshake et al., 'Not What You've Signed Up For'](https://dl.acm.org/doi/10.1145/3605764.3623985) | 2026-11-24 |
+| [L6.02](#l602) | Indirect prompt injection through what the agent reads | WILD | 2023-11-26 · [Greshake et al., 'Not What You've Signed Up For'](https://dl.acm.org/doi/10.1145/3605764.3623985) | 2026-11-26 |
+| [L6.13](#l613) | Gate/executor parse differential | PoC | 2026-11-22 · [Li, arXiv 2611.29546](https://arxiv.org/abs/2611.29546) | 2026-11-25 |
+| [L6.16](#l616) | Security downgrade during failure recovery | PoC | 2026-11-25 · [Ma et al., 'The Detour Is the Danger', arXiv 2611.33605](https://arxiv.org/abs/2611.33605) | 2026-11-25 |
 | [L6.04](#l604) | Malicious or defective MCP server or package | WILD | 2025-09-25 · [Postmark](https://postmarkapp.com/blog/information-regarding-malicious-postmark-mcp-package) | 2026-11-24 |
 | [L6.09](#l609) | Context privilege escalation | PoC | 2026-09 · [Rajasekaran et al., arXiv 2609.01222](https://arxiv.org/abs/2609.01222) | 2026-11-24 |
 | [L6.15](#l615) | Permission-reply policy rewrite | PoC | 2026-11-24 · [Fei et al., 'When Answering Is Administering', arXiv 2611.32195](https://arxiv.org/abs/2611.32195) | 2026-11-24 |
 | [L6.03](#l603) | MCP tool poisoning and rug pull | PoC | 2025-04-01 · [Invariant Labs](https://invariantlabs.ai/blog/mcp-security-notification-tool-poisoning-attacks) | 2026-11-23 |
 | [L6.06](#l606) | Malicious or vulnerable agent skills | PoC | 2025-10-30 · [Schmotz et al., arXiv 2510.26328](https://arxiv.org/abs/2510.26328) | 2026-11-23 |
-| [L6.13](#l613) | Gate/executor parse differential | PoC | 2026-11-22 · [Li, arXiv 2611.29546](https://arxiv.org/abs/2611.29546) | 2026-11-23 |
 | [L6.12](#l612) | Tool-argument injection into shell or SQL backends | CVE | 2026-11-18 · [NVD / CVE record (CNA: GitHub)](https://nvd.nist.gov/vuln/detail/CVE-2026-130008) | 2026-11-21 |
 | [L6.14](#l614) | Information-gap disclosure (no injection needed) | PoC | 2026-11-17 · [Cheong et al., arXiv 2611.22223](https://arxiv.org/abs/2611.22223) | 2026-11-17 |
 | [L6.11](#l611) | MCP OAuth discovery redirects client credentials | CVE | 2026-11-16 · [GitHub Security Advisory (python-sdk)](https://github.com/advisories/GHSA-qx49-fqc8-xw99) | 2026-11-16 |
@@ -38,15 +39,45 @@ Instructions are planted in content the agent will retrieve later (repository fi
 
 | Date | What happened | Source |
 |---|---|---|
+| 2026-11-26 | markdownify-mcp CVE-2026-137308 (before 1.2.0): URL validation is bypassed with DNS names, bracketed IPv6 literals or IPv4-mapped IPv6 addresses, so prompt injection steers its webpage and git-repo conversion tools to loopback services, internal hosts and cloud metadata endpoints. | [NVD / CVE record (CNA: VulnCheck)](https://nvd.nist.gov/vuln/detail/CVE-2026-137308) |
 | 2026-11-24 | browser-use CVE-2026-136452 (before 1.0.0): a URL parser differential lets an injected navigate action bypass the configured allowed-domain, prohibited-domain and IP-block checks and reach loopback, private or arbitrary hosts. | [NVD / CVE record (CNA: VulnCheck)](https://nvd.nist.gov/vuln/detail/CVE-2026-136452) |
 | 2026-11-23 | An injected instruction adds a secret to an upload addressed to the approved service; a host mediator that delivers approved uploads also delivers the secret, including encoded secrets (small single-model studies). | [Singh & Guda, 'Where Agent Defenses Fail', arXiv 2611.31541](https://arxiv.org/abs/2611.31541) |
+| 2026-11-23 | Conartist: adaptive injection embeds malicious steps that look consistent with the user's task and tunes itself on the harness's own risk-audit feedback; 32.12% attack success on a 576-instance tool-use benchmark and 66.67% on a Reddit GUI benchmark across five models; seven exploitable patterns found in OpenClaw, where the auditing step itself adds exploitable actions. | [Rong et al., arXiv 2611.29977](https://arxiv.org/abs/2611.29977) |
+| 2026-11-21 | First large-scale measurement in the wild: across about 145 million GitHub issues, pull requests, comments and READMEs, 2,281 validated findings of text hidden from human readers but read in full by agents; attacks on other parties' agents are rare (about one in 3.3 million items) and aim at maintainers' triage, review and CI agents. Replayed offline, they succeeded against one small model of five in 19% of cases. | [Nakibly & Babo, arXiv 2611.28763](https://arxiv.org/abs/2611.28763) |
 | 2026-11-20 | FlowIntel CVE-2026-133631: the chatbot's API tool let the model call any FlowIntel endpoint, including admin routes, with no allow-list, so untrusted case content that steers the model could modify data or reach restricted routes; fixed in 4.1.0. | [NVD / CVE record (CNA: CIRCL)](https://nvd.nist.gov/vuln/detail/CVE-2026-133631) |
+| 2026-11-18 | Injected commands survive rendering documents as page images: across 191 question-answering sources and six multimodal models, Qwen3-VL-8B still executed image-borne answer replacement 77.96% of the time, and a search over eight attack candidates largely closed the image gap for Qwen and Gemini; trusted user authorisation raised execution on unchanged pages. | [Liu et al., arXiv 2611.24231](https://arxiv.org/abs/2611.24231) |
 | 2026-11-07 | Systematisation of 98 sources and 284 atomic attacks on agentic systems; only 11.5% of assessed attack-safeguard relations show strong coverage. | [Truong-Le et al., 'Agents of Chaos', arXiv 2611.10843](https://arxiv.org/abs/2611.10843) |
 | 2026-10-16 | Trojan Horse: fully automated repository poisoning against coding agents (exfiltration, deletion, tampering, implanted backdoors). | [Yang et al., arXiv 2610.23109](https://arxiv.org/abs/2610.23109) |
 | 2026-10-01 | ToolLeak plus two-channel injection (tool description and tool return) achieves remote code execution on six real coding agents. | [ACM TOSEM, 10.1145/3832267](https://dl.acm.org/doi/10.1145/3832267) |
 | 2026-08-14 | Workspace topology strongly shapes indirect prompt injection success in coding assistants. | [Day et al., arXiv 2608.14876](https://arxiv.org/abs/2608.14876) |
 | 2026-05-25 | 314 payloads against agentic coding assistants succeed 41-84% across workspaces. | [Liu et al., arXiv 2605.25871](https://arxiv.org/abs/2605.25871) |
 | 2023-11-26 | Indirect prompt injection defined and shown against Bing Chat and code-completion engines (AISec 2023; preprint February 2023). **(first)** | [Greshake et al., 'Not What You've Signed Up For'](https://dl.acm.org/doi/10.1145/3605764.3623985) |
+
+## L6.13
+
+### Gate/executor parse differential
+
+**Evidence:** PoC · **First described:** 2026-11-22, Li, arXiv 2611.29546
+
+The approval gate parses a command or tool call one way and the executor runs it another way, so an approved action also does something the policy forbids. Shell: a hidden second command, a 'read-only' utility whose arguments write files or whose repository config starts a program, or an allow rule that disables a sandbox. Tool-call JSON: repeated or disguised keys, or JSON inside a string argument, read differently by guard and executor.
+
+| Date | What happened | Source |
+|---|---|---|
+| 2026-11-25 | DeepSeek-Reasonix CVE-2026-137056 (before 2.53.0): its shell classifier auto-approves git blame and git whatchanged as read-only, so a diff textconv driver planted in .gitattributes and .git/config runs attacker commands with the user's privileges, via prompt injection or routine use, exposing stored provider API keys and session history. | [NVD / CVE record (CNA: VulnCheck)](https://nvd.nist.gov/vuln/detail/CVE-2026-137056) |
+| 2026-11-23 | Tool-call smuggling: guard and executor parse the same JSON differently (e.g. which repeated key counts); most of 17 pinned parser configurations disagree, including two official MCP SDKs; the audit log records only the approved call; a cloned tool schema with one extra field gets the model to fill it with user data, unseen by the guard. | [Santos-Grueiro & Romero-Ruiz, arXiv 2611.30624](https://arxiv.org/abs/2611.30624) |
+| 2026-11-22 | ParseGap: 17 root causes across eight production coding agents; policy violations in all 16 agent-model pairs tested live (14 under configured restrictions); vendor details redacted during a 90-day disclosure window. **(first)** | [Li, arXiv 2611.29546](https://arxiv.org/abs/2611.29546) |
+
+## L6.16
+
+### Security downgrade during failure recovery
+
+**Evidence:** PoC · **First described:** 2026-11-25, Ma et al., 'The Detour Is the Danger', arXiv 2611.33605
+
+When a protection step fails (a scan, a backup, an access check), the agent replans and completes the sensitive operation another way, without the protection: the scanner is down, so the file is uploaded unscanned. No injected instruction and no changed tool is needed; an attacker only has to make the protection service fail, and ordinary failures do it too.
+
+| Date | What happened | Source |
+|---|---|---|
+| 2026-11-25 | Fault injection in an MCP/Skill environment across seven LLMs, twelve task templates and three domains (file operations, uploads, database queries): 16.5% of runs downgraded security after targeted faults (3.6% after random faults), protection was lost in a third of healthy runs too, and most downgraded runs still completed the task. **(first)** | [Ma et al., 'The Detour Is the Danger', arXiv 2611.33605](https://arxiv.org/abs/2611.33605) |
 
 ## L6.04
 
@@ -119,22 +150,10 @@ Skills are markdown instructions plus scripts loaded on demand. A long skill can
 | Date | What happened | Source |
 |---|---|---|
 | 2026-11-23 | All 48,682 ClawHub skills: flaws left by benign authors escalate prompt injection to code execution; 21 of 22 sampled first-party flaws exploited end to end, while dependency CVEs were reachable in only 3.0% of affected skills; a live agent ran the injected payload in 48.5% of sampled flagged skills, mostly in its own shell. | [Li et al., arXiv 2611.30932](https://arxiv.org/abs/2611.30932) |
+| 2026-11-20 | pmo-platform CVE-2026-77390 (before 3.73): a Claude Code skill's local evaluation viewer follows symlinks out of the workspace and embeds their targets, uncapped and unredacted, into a no-auth local page or shareable HTML file; its feedback endpoint accepts writes with no authentication, Origin check or CSRF token, so any web page or a DNS-rebound localhost target can change it while it runs. | [NVD / CVE record (CNA: GitHub)](https://nvd.nist.gov/vuln/detail/CVE-2026-77390) |
 | 2026-11-09 | StealthyPoison: procedural poisoning of third-party skills that wins selection against a full benign registry. | [Qiao et al., arXiv 2611.12155](https://arxiv.org/abs/2611.12155) |
 | 2026-06-28 | Audit of 3,984 marketplace skills finds a substantial share with risky patterns, including credential leakage. | [Cloud Security Alliance](https://labs.cloudsecurityalliance.org/research/ai-coding-agent-attack-surface-mcp-repository-poisoning-v1-0/) |
 | 2025-10-30 | Agent Skills enable trivially simple prompt injections; a 'don't ask again' approval carries over to related harmful actions. **(first)** | [Schmotz et al., arXiv 2510.26328](https://arxiv.org/abs/2510.26328) |
-
-## L6.13
-
-### Gate/executor parse differential
-
-**Evidence:** PoC · **First described:** 2026-11-22, Li, arXiv 2611.29546
-
-The approval gate parses a command or tool call one way and the executor runs it another way, so an approved action also does something the policy forbids. Shell: a hidden second command, a 'read-only' utility whose arguments write files, or an allow rule that disables a sandbox. Tool-call JSON: repeated or disguised keys, or JSON inside a string argument, read differently by guard and executor.
-
-| Date | What happened | Source |
-|---|---|---|
-| 2026-11-23 | Tool-call smuggling: guard and executor parse the same JSON differently (e.g. which repeated key counts); most of 17 pinned parser configurations disagree, including two official MCP SDKs; the audit log records only the approved call; a cloned tool schema with one extra field gets the model to fill it with user data, unseen by the guard. | [Santos-Grueiro & Romero-Ruiz, arXiv 2611.30624](https://arxiv.org/abs/2611.30624) |
-| 2026-11-22 | ParseGap: 17 root causes across eight production coding agents; policy violations in all 16 agent-model pairs tested live (14 under configured restrictions); vendor details redacted during a 90-day disclosure window. **(first)** | [Li, arXiv 2611.29546](https://arxiv.org/abs/2611.29546) |
 
 ## L6.12
 

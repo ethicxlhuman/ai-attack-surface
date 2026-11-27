@@ -1,5 +1,5 @@
 {
-  "updated": "2026-11-26",
+  "updated": "2026-11-27",
   "layers": [
     {
       "id": "L1",
@@ -705,6 +705,12 @@
           "url": "https://arxiv.org/abs/2611.28543"
         },
         {
+          "date": "2026-11-20",
+          "what": "An LLM performs the weight edit itself: from a natural-language backdoor specification, with no gradients, layer hints or editing formula, DeepSeek Flash edited Qwen3.5-0.8B, Llama-3.2-1B and SmolLM3-3B to 99.2% mean attack success (97.6% on an unseen domain) with clean accuracy within 1.7 points, at about $1.74 per run; edits landed in the final layer in 17 of 18 runs.",
+          "source": "Liu et al., arXiv 2611.27920",
+          "url": "https://arxiv.org/abs/2611.27920"
+        },
+        {
           "date": "2026-11-11",
           "what": "Lazarus: seven neurons fitted on 23 trajectories emit the payload on at least 98.8% of triggered contexts in Nemotron-Terminal-8B with no observed benign leakage; benchmarks unchanged on Qwen3.6-27B.",
           "source": "Zeng, Severi, Bullwinkel, Horvitz, Papailiopoulos, arXiv 2611.15118",
@@ -737,6 +743,12 @@
       "summary": "Instructions are planted in content the agent will retrieve later (repository files, issues, logs, web pages, tool output), so the attacker never talks to the model directly.",
       "events": [
         {
+          "date": "2026-11-26",
+          "what": "markdownify-mcp CVE-2026-137308 (before 1.2.0): URL validation is bypassed with DNS names, bracketed IPv6 literals or IPv4-mapped IPv6 addresses, so prompt injection steers its webpage and git-repo conversion tools to loopback services, internal hosts and cloud metadata endpoints.",
+          "source": "NVD / CVE record (CNA: VulnCheck)",
+          "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-137308"
+        },
+        {
           "date": "2026-11-24",
           "what": "browser-use CVE-2026-136452 (before 1.0.0): a URL parser differential lets an injected navigate action bypass the configured allowed-domain, prohibited-domain and IP-block checks and reach loopback, private or arbitrary hosts.",
           "source": "NVD / CVE record (CNA: VulnCheck)",
@@ -749,10 +761,28 @@
           "url": "https://arxiv.org/abs/2611.31541"
         },
         {
+          "date": "2026-11-23",
+          "what": "Conartist: adaptive injection embeds malicious steps that look consistent with the user's task and tunes itself on the harness's own risk-audit feedback; 32.12% attack success on a 576-instance tool-use benchmark and 66.67% on a Reddit GUI benchmark across five models; seven exploitable patterns found in OpenClaw, where the auditing step itself adds exploitable actions.",
+          "source": "Rong et al., arXiv 2611.29977",
+          "url": "https://arxiv.org/abs/2611.29977"
+        },
+        {
+          "date": "2026-11-21",
+          "what": "First large-scale measurement in the wild: across about 145 million GitHub issues, pull requests, comments and READMEs, 2,281 validated findings of text hidden from human readers but read in full by agents; attacks on other parties' agents are rare (about one in 3.3 million items) and aim at maintainers' triage, review and CI agents. Replayed offline, they succeeded against one small model of five in 19% of cases.",
+          "source": "Nakibly & Babo, arXiv 2611.28763",
+          "url": "https://arxiv.org/abs/2611.28763"
+        },
+        {
           "date": "2026-11-20",
           "what": "FlowIntel CVE-2026-133631: the chatbot's API tool let the model call any FlowIntel endpoint, including admin routes, with no allow-list, so untrusted case content that steers the model could modify data or reach restricted routes; fixed in 4.1.0.",
           "source": "NVD / CVE record (CNA: CIRCL)",
           "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-133631"
+        },
+        {
+          "date": "2026-11-18",
+          "what": "Injected commands survive rendering documents as page images: across 191 question-answering sources and six multimodal models, Qwen3-VL-8B still executed image-borne answer replacement 77.96% of the time, and a search over eight attack candidates largely closed the image gap for Qwen and Gemini; trusted user authorisation raised execution on unchanged pages.",
+          "source": "Liu et al., arXiv 2611.24231",
+          "url": "https://arxiv.org/abs/2611.24231"
         },
         {
           "date": "2026-11-07",
@@ -921,6 +951,12 @@
           "url": "https://arxiv.org/abs/2611.30932"
         },
         {
+          "date": "2026-11-20",
+          "what": "pmo-platform CVE-2026-77390 (before 3.73): a Claude Code skill's local evaluation viewer follows symlinks out of the workspace and embeds their targets, uncapped and unredacted, into a no-auth local page or shareable HTML file; its feedback endpoint accepts writes with no authentication, Origin check or CSRF token, so any web page or a DNS-rebound localhost target can change it while it runs.",
+          "source": "NVD / CVE record (CNA: GitHub)",
+          "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-77390"
+        },
+        {
           "date": "2026-11-09",
           "what": "StealthyPoison: procedural poisoning of third-party skills that wins selection against a full benign registry.",
           "source": "Qiao et al., arXiv 2611.12155",
@@ -1076,15 +1112,21 @@
     {
       "id": "L3.10",
       "layer": "L3",
-      "name": "Stale recovered state served across tenants",
+      "name": "Cross-tenant KV-cache exposure (stale state or redirected block mapping)",
       "evidence": "PoC",
-      "summary": "After an interrupted KV-cache load, half-written cache blocks stay marked valid, so the next tenant's request reads state that belongs to someone else. The same class covers a deferred approval reused after its target was revised.",
+      "summary": "Another tenant's cached model state ends up in your request. Either an interrupted KV-cache load leaves half-written blocks marked valid, so the next request reads state that belongs to someone else (the same class covers a deferred approval reused after its target was revised), or a corrupted block-table entry in a paged KV cache points one request at another tenant's blocks.",
       "events": [
         {
           "date": "2026-11-21",
           "what": "On vLLM with a KV-cache connector, a second tenant generated a schema-valid tool call naming the wrong tenant in 10/10 induced-fault runs (recorded, not executed); upstream PR 61769 met 2 of 7 fault predicates.",
           "source": "Zhang et al., arXiv 2611.29004",
-          "url": "https://arxiv.org/abs/2611.29004",
+          "url": "https://arxiv.org/abs/2611.29004"
+        },
+        {
+          "date": "2026-11-19",
+          "what": "BlockJack: corrupting a vLLM paged-KV block-table entry (shown physically with Rowhammer) redirects a request's cache reads to another tenant's blocks without changing weights, prompts or cache contents; victim context appeared in attacker responses across seven models, and on a 248-scene medical benchmark attacker context steered up to 41.1% of victim answers toward less urgent care. Needs a hardware memory fault.",
+          "source": "Wang et al., arXiv 2611.25945",
+          "url": "https://arxiv.org/abs/2611.25945",
           "first": true
         }
       ]
@@ -1094,8 +1136,14 @@
       "layer": "L6",
       "name": "Gate/executor parse differential",
       "evidence": "PoC",
-      "summary": "The approval gate parses a command or tool call one way and the executor runs it another way, so an approved action also does something the policy forbids. Shell: a hidden second command, a 'read-only' utility whose arguments write files, or an allow rule that disables a sandbox. Tool-call JSON: repeated or disguised keys, or JSON inside a string argument, read differently by guard and executor.",
+      "summary": "The approval gate parses a command or tool call one way and the executor runs it another way, so an approved action also does something the policy forbids. Shell: a hidden second command, a 'read-only' utility whose arguments write files or whose repository config starts a program, or an allow rule that disables a sandbox. Tool-call JSON: repeated or disguised keys, or JSON inside a string argument, read differently by guard and executor.",
       "events": [
+        {
+          "date": "2026-11-25",
+          "what": "DeepSeek-Reasonix CVE-2026-137056 (before 2.53.0): its shell classifier auto-approves git blame and git whatchanged as read-only, so a diff textconv driver planted in .gitattributes and .git/config runs attacker commands with the user's privileges, via prompt injection or routine use, exposing stored provider API keys and session history.",
+          "source": "NVD / CVE record (CNA: VulnCheck)",
+          "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-137056"
+        },
         {
           "date": "2026-11-23",
           "what": "Tool-call smuggling: guard and executor parse the same JSON differently (e.g. which repeated key counts); most of 17 pinned parser configurations disagree, including two official MCP SDKs; the audit log records only the approved call; a cloned tool schema with one extra field gets the model to fill it with user data, unseen by the guard.",
@@ -1151,10 +1199,22 @@
       "summary": "The runner's HTTP server mishandles fields in an ordinary API request (memory errors, missing validation), so anyone who can reach the endpoint can crash it or corrupt memory, with no model file involved.",
       "events": [
         {
+          "date": "2026-11-25",
+          "what": "llama.cpp CVE-2026-137057 (b7118 before b12604): a GBNF grammar repetition whose max is lower than its min, sent in a llama-server /completion request, underflows an integer and generates endless rules; the process hangs and exhausts memory. Remote, unauthenticated, availability only.",
+          "source": "NVD / CVE record (CNA: VulnCheck)",
+          "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-137057"
+        },
+        {
           "date": "2026-11-21",
           "what": "llama.cpp CVE-2026-134540: llama-server does not validate grammar_triggers[].type in a request; remote and unauthenticated, public reproducer, availability impact only (fixed in b12405).",
           "source": "NVD / CVE record (CNA: VulDB)",
           "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-134540"
+        },
+        {
+          "date": "2026-11-18",
+          "what": "vLLM CVE-2026-130685 and CVE-2026-130686 (both fixed in 0.33.0): with --skip-tokenizer-init, out-of-range prompt token IDs crash the shared engine for every tenant (0.28.0 onward); and with no request-wide media budget, one compact request forces download and decode of many remote images before prompt-length checks (0.6.0 onward). Availability only.",
+          "source": "NVD / CVE records (CNA: VulnCheck)",
+          "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-130685"
         },
         {
           "date": "2026-08-07",
@@ -1183,6 +1243,22 @@
           "what": "LiteLLM discloses that `litellm==1.107.0` on PyPI (about two hours) and Docker/GHCR tags `v1.107.0`, `latest`, `main-latest` and `main-stable` (about 2.5 hours) were built from attacker-controlled code; the GitHub source tag was clean.",
           "source": "LiteLLM security incident post",
           "url": "https://docs.litellm.ai/blog/security-incident-oct-21-2026",
+          "first": true
+        }
+      ]
+    },
+    {
+      "id": "L6.16",
+      "layer": "L6",
+      "name": "Security downgrade during failure recovery",
+      "evidence": "PoC",
+      "summary": "When a protection step fails (a scan, a backup, an access check), the agent replans and completes the sensitive operation another way, without the protection: the scanner is down, so the file is uploaded unscanned. No injected instruction and no changed tool is needed; an attacker only has to make the protection service fail, and ordinary failures do it too.",
+      "events": [
+        {
+          "date": "2026-11-25",
+          "what": "Fault injection in an MCP/Skill environment across seven LLMs, twelve task templates and three domains (file operations, uploads, database queries): 16.5% of runs downgraded security after targeted faults (3.6% after random faults), protection was lost in a third of healthy runs too, and most downgraded runs still completed the task.",
+          "source": "Ma et al., 'The Detour Is the Danger', arXiv 2611.33605",
+          "url": "https://arxiv.org/abs/2611.33605",
           "first": true
         }
       ]

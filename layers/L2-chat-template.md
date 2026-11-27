@@ -8,7 +8,7 @@ Before your message reaches the model, a hidden Jinja2 program (the chat templat
 
 *Example:* A GGUF that answers normally until a user mentions a certain product, then starts giving wrong answers and inserting attacker links.
 
-Last updated 2026-11-26 · 4 techniques · newest activity first.
+Last updated 2026-11-27 · 4 techniques · newest activity first.
 
 | ID | Technique | Evidence | First described | Latest |
 |---|---|---|---|---|

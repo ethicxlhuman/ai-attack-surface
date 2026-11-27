@@ -2,6 +2,13 @@
 
 Newest first.
 
+## 2026-11-27
+
+- 1 new technique: L6.16 security downgrade during failure recovery: a failed protection step leads the agent to finish the sensitive operation another way, without the protection (arXiv 2611.33605).
+- New events: L6.13 DeepSeek-Reasonix CVE-2026-137056 (an auto-approved `git blame` runs a planted textconv driver); L3.11 llama.cpp CVE-2026-137057 and vLLM CVE-2026-130685/130686; L6.02 markdownify-mcp CVE-2026-137308, hidden AI-directed text measured across GitHub (arXiv 2611.28763), Conartist adaptive injection (arXiv 2611.29977) and injections that survive rendering to images (arXiv 2611.24231); L6.06 pmo-platform CVE-2026-77390; L5.05 weight edits performed by an LLM (arXiv 2611.27920); L3.10 BlockJack redirected KV-cache block mapping (arXiv 2611.25945).
+- Renamed L3.10 to "Cross-tenant KV-cache exposure (stale state or redirected block mapping)".
+- Now 48 techniques, 122 dated events. Every new event checked against its paper or NVD record on 2026-11-27.
+
 ## 2026-11-26
 
 - 1 new technique: L3.12 compromised runner or gateway release (LiteLLM `1.107.0` on PyPI and Docker/GHCR, 2026-10-21: `.pth` and `sitecustomize.py` startup hooks that steal credentials; LiteLLM incident post, Microsoft analysis).

@@ -8,7 +8,7 @@ A model download is a package from a stranger. Some formats (Python pickle: .bin
 
 *Example:* A Hugging Face repository that looks like a popular model but opens a reverse shell or starts a crypto-miner the moment you load it.
 
-Last updated 2026-11-26 · 5 techniques · newest activity first.
+Last updated 2026-11-27 · 5 techniques · newest activity first.
 
 | ID | Technique | Evidence | First described | Latest |
 |---|---|---|---|---|
