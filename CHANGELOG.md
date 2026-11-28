@@ -2,6 +2,12 @@
 
 Newest first.
 
+## 2026-11-28
+
+- New events: L3.11 llama.cpp ggml RPC server heap write CVE-2026-137567 and vLLM validation-error response amplification CVE-2026-137476; L3.10 vLLM cross-user token leak through async scheduling with pipeline parallelism CVE-2026-137477; L3.03 gguf-tools out-of-bounds read CVE-2026-133610; L6.04 a clean trading skill whose setup launched an unpinned MCP server later published with a credential stealer (`mcp-aevo-server`, Knostic); L6.02 SiYuan AI chat replies rendered as code CVE-2026-137469 and ServiceNow email-agent prompt injection CVE-2026-18883; L4.06 unauthenticated settings API that rewrites a social robot's system prompt (arXiv 2611.22761, now the technique's first event).
+- Renamed L3.10 to "Cross-tenant KV-cache exposure (stale state, redirected block mapping or scheduler token reuse)" and L4.06 to "Management side door next to the AI (MCP endpoints, embodied-agent settings APIs)".
+- Now 48 techniques, 130 dated events. Every new event checked against its NVD record, advisory, vendor post or paper on 2026-11-28.
+
 ## 2026-11-27
 
 - 1 new technique: L6.16 security downgrade during failure recovery: a failed protection step leads the agent to finish the sensitive operation another way, without the protection (arXiv 2611.33605).

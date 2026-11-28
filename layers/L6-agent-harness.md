@@ -8,14 +8,14 @@ The harness (Claude Code, Codex CLI, Cursor, Copilot, Gemini CLI, OpenClaw and o
 
 *Example:* A README in a cloned repository that talks the agent into requesting a broad 'always allow' rule; a fake extension in an IDE marketplace that installs a backdoor.
 
-Last updated 2026-11-27 · 16 techniques · newest activity first.
+Last updated 2026-11-28 · 16 techniques · newest activity first.
 
 | ID | Technique | Evidence | First described | Latest |
 |---|---|---|---|---|
 | [L6.02](#l602) | Indirect prompt injection through what the agent reads | WILD | 2023-11-26 · [Greshake et al., 'Not What You've Signed Up For'](https://dl.acm.org/doi/10.1145/3605764.3623985) | 2026-11-26 |
+| [L6.04](#l604) | Malicious or defective MCP server or package | WILD | 2025-09-25 · [Postmark](https://postmarkapp.com/blog/information-regarding-malicious-postmark-mcp-package) | 2026-11-25 |
 | [L6.13](#l613) | Gate/executor parse differential | PoC | 2026-11-22 · [Li, arXiv 2611.29546](https://arxiv.org/abs/2611.29546) | 2026-11-25 |
 | [L6.16](#l616) | Security downgrade during failure recovery | PoC | 2026-11-25 · [Ma et al., 'The Detour Is the Danger', arXiv 2611.33605](https://arxiv.org/abs/2611.33605) | 2026-11-25 |
-| [L6.04](#l604) | Malicious or defective MCP server or package | WILD | 2025-09-25 · [Postmark](https://postmarkapp.com/blog/information-regarding-malicious-postmark-mcp-package) | 2026-11-24 |
 | [L6.09](#l609) | Context privilege escalation | PoC | 2026-09 · [Rajasekaran et al., arXiv 2609.01222](https://arxiv.org/abs/2609.01222) | 2026-11-24 |
 | [L6.15](#l615) | Permission-reply policy rewrite | PoC | 2026-11-24 · [Fei et al., 'When Answering Is Administering', arXiv 2611.32195](https://arxiv.org/abs/2611.32195) | 2026-11-24 |
 | [L6.03](#l603) | MCP tool poisoning and rug pull | PoC | 2025-04-01 · [Invariant Labs](https://invariantlabs.ai/blog/mcp-security-notification-tool-poisoning-attacks) | 2026-11-23 |
@@ -39,12 +39,14 @@ Instructions are planted in content the agent will retrieve later (repository fi
 
 | Date | What happened | Source |
 |---|---|---|
+| 2026-11-26 | SiYuan CVE-2026-137469 (3.7.0 before 3.8.11): the AI agent chat panel rendered final and saved assistant replies into innerHTML without sanitisation, so anyone who can steer a reply (injected content the agent reads, or a configured model endpoint) gets script run in the app; in desktop local-kernel mode that reaches OS commands. The AI's reply is the step that becomes code. | [NVD / CVE record (CNA: VulnCheck)](https://nvd.nist.gov/vuln/detail/CVE-2026-137469) |
 | 2026-11-26 | markdownify-mcp CVE-2026-137308 (before 1.2.0): URL validation is bypassed with DNS names, bracketed IPv6 literals or IPv4-mapped IPv6 addresses, so prompt injection steers its webpage and git-repo conversion tools to loopback services, internal hosts and cloud metadata endpoints. | [NVD / CVE record (CNA: VulnCheck)](https://nvd.nist.gov/vuln/detail/CVE-2026-137308) |
 | 2026-11-24 | browser-use CVE-2026-136452 (before 1.0.0): a URL parser differential lets an injected navigate action bypass the configured allowed-domain, prohibited-domain and IP-block checks and reach loopback, private or arbitrary hosts. | [NVD / CVE record (CNA: VulnCheck)](https://nvd.nist.gov/vuln/detail/CVE-2026-136452) |
 | 2026-11-23 | An injected instruction adds a secret to an upload addressed to the approved service; a host mediator that delivers approved uploads also delivers the secret, including encoded secrets (small single-model studies). | [Singh & Guda, 'Where Agent Defenses Fail', arXiv 2611.31541](https://arxiv.org/abs/2611.31541) |
 | 2026-11-23 | Conartist: adaptive injection embeds malicious steps that look consistent with the user's task and tunes itself on the harness's own risk-audit feedback; 32.12% attack success on a 576-instance tool-use benchmark and 66.67% on a Reddit GUI benchmark across five models; seven exploitable patterns found in OpenClaw, where the auditing step itself adds exploitable actions. | [Rong et al., arXiv 2611.29977](https://arxiv.org/abs/2611.29977) |
 | 2026-11-21 | First large-scale measurement in the wild: across about 145 million GitHub issues, pull requests, comments and READMEs, 2,281 validated findings of text hidden from human readers but read in full by agents; attacks on other parties' agents are rare (about one in 3.3 million items) and aim at maintainers' triage, review and CI agents. Replayed offline, they succeeded against one small model of five in 19% of cases. | [Nakibly & Babo, arXiv 2611.28763](https://arxiv.org/abs/2611.28763) |
 | 2026-11-20 | FlowIntel CVE-2026-133631: the chatbot's API tool let the model call any FlowIntel endpoint, including admin routes, with no allow-list, so untrusted case content that steers the model could modify data or reach restricted routes; fixed in 4.1.0. | [NVD / CVE record (CNA: CIRCL)](https://nvd.nist.gov/vuln/detail/CVE-2026-133631) |
+| 2026-11-19 | ServiceNow CVE-2026-18883: indirect prompt injection in the Email Response AI Agent of Now Assist for CSM, introduced in the Australia family release and fixed centrally by the vendor; no method or exploitation published. | [NVD / CVE record; ServiceNow KB3235180](https://nvd.nist.gov/vuln/detail/CVE-2026-18883) |
 | 2026-11-18 | Injected commands survive rendering documents as page images: across 191 question-answering sources and six multimodal models, Qwen3-VL-8B still executed image-borne answer replacement 77.96% of the time, and a search over eight attack candidates largely closed the image gap for Qwen and Gemini; trusted user authorisation raised execution on unchanged pages. | [Liu et al., arXiv 2611.24231](https://arxiv.org/abs/2611.24231) |
 | 2026-11-07 | Systematisation of 98 sources and 284 atomic attacks on agentic systems; only 11.5% of assessed attack-safeguard relations show strong coverage. | [Truong-Le et al., 'Agents of Chaos', arXiv 2611.10843](https://arxiv.org/abs/2611.10843) |
 | 2026-10-16 | Trojan Horse: fully automated repository poisoning against coding agents (exfiltration, deletion, tampering, implanted backdoors). | [Yang et al., arXiv 2610.23109](https://arxiv.org/abs/2610.23109) |
@@ -52,6 +54,22 @@ Instructions are planted in content the agent will retrieve later (repository fi
 | 2026-08-14 | Workspace topology strongly shapes indirect prompt injection success in coding assistants. | [Day et al., arXiv 2608.14876](https://arxiv.org/abs/2608.14876) |
 | 2026-05-25 | 314 payloads against agentic coding assistants succeed 41-84% across workspaces. | [Liu et al., arXiv 2605.25871](https://arxiv.org/abs/2605.25871) |
 | 2023-11-26 | Indirect prompt injection defined and shown against Bing Chat and code-completion engines (AISec 2023; preprint February 2023). **(first)** | [Greshake et al., 'Not What You've Signed Up For'](https://dl.acm.org/doi/10.1145/3605764.3623985) |
+
+## L6.04
+
+### Malicious or defective MCP server or package
+
+**Evidence:** WILD · **First described:** 2025-09-25, Postmark
+
+An attacker publishes an MCP server under a trusted-looking name, builds trust over several releases, then ships a version that steals data. A benign server can do the same damage when its own code leaks or does more than its description says.
+
+| Date | What happened | Source |
+|---|---|---|
+| 2026-11-25 | A public Aevo trading skill's README told users to launch the MCP server with `uvx mcp-aevo-server`, unpinned, with exchange API secret and signing key in its environment. The skill text was clean; versions later published under that PyPI name (0.2.0.post1-post4, post6, 2026-11-16/17) sent those values to a Telegram bot at server start, and post6 added a shell driven from the same chat. Static review only; no infections found. | [Knostic (also GHSA-g97f-vppp-p428)](https://www.knostic.ai/blog/a-trading-skill-s-setup-pointed-to-a-credential-stealing-mcp-server) |
+| 2026-11-24 | Amazon ECS MCP Server CVE-2026-135614 (before 0.1.36): prompt injection makes the agent call the troubleshooting tool, whose redaction misses cleartext container environment values and secret references from ECS task definitions. | [NVD / CVE record (CNA: AMZN)](https://nvd.nist.gov/vuln/detail/CVE-2026-135614) |
+| 2026-11-20 | Fake 'MCP config doctor' npm package @guicai777/mcp-doctor 1.0.1 prints a real diagnostic and, on Windows, launches a bundled StealC v2 infostealer; vendor analysis, no confirmed victims. | [Knostic](https://www.knostic.ai/blog/an-mcp-config-doctor-that-drops-an-infostealer) |
+| 2026-11-17 | Capability laundering: tool code does what its description omits; code-derived capability modelling of 43 real agents finds hundreds of structurally vulnerable paths, ten confirmed with proof-of-concept exploits. | [Santra et al., 'ACaM', arXiv 2611.23507](https://arxiv.org/abs/2611.23507) |
+| 2025-09-25 | Fake 'postmark-mcp' npm package secretly BCC'd every email to the attacker from version 1.0.16, after 15 clean versions. **(first)** | [Postmark](https://postmarkapp.com/blog/information-regarding-malicious-postmark-mcp-package) |
 
 ## L6.13
 
@@ -78,21 +96,6 @@ When a protection step fails (a scan, a backup, an access check), the agent repl
 | Date | What happened | Source |
 |---|---|---|
 | 2026-11-25 | Fault injection in an MCP/Skill environment across seven LLMs, twelve task templates and three domains (file operations, uploads, database queries): 16.5% of runs downgraded security after targeted faults (3.6% after random faults), protection was lost in a third of healthy runs too, and most downgraded runs still completed the task. **(first)** | [Ma et al., 'The Detour Is the Danger', arXiv 2611.33605](https://arxiv.org/abs/2611.33605) |
-
-## L6.04
-
-### Malicious or defective MCP server or package
-
-**Evidence:** WILD · **First described:** 2025-09-25, Postmark
-
-An attacker publishes an MCP server under a trusted-looking name, builds trust over several releases, then ships a version that steals data. A benign server can do the same damage when its own code leaks or does more than its description says.
-
-| Date | What happened | Source |
-|---|---|---|
-| 2026-11-24 | Amazon ECS MCP Server CVE-2026-135614 (before 0.1.36): prompt injection makes the agent call the troubleshooting tool, whose redaction misses cleartext container environment values and secret references from ECS task definitions. | [NVD / CVE record (CNA: AMZN)](https://nvd.nist.gov/vuln/detail/CVE-2026-135614) |
-| 2026-11-20 | Fake 'MCP config doctor' npm package @guicai777/mcp-doctor 1.0.1 prints a real diagnostic and, on Windows, launches a bundled StealC v2 infostealer; vendor analysis, no confirmed victims. | [Knostic](https://www.knostic.ai/blog/an-mcp-config-doctor-that-drops-an-infostealer) |
-| 2026-11-17 | Capability laundering: tool code does what its description omits; code-derived capability modelling of 43 real agents finds hundreds of structurally vulnerable paths, ten confirmed with proof-of-concept exploits. | [Santra et al., 'ACaM', arXiv 2611.23507](https://arxiv.org/abs/2611.23507) |
-| 2025-09-25 | Fake 'postmark-mcp' npm package secretly BCC'd every email to the attacker from version 1.0.16, after 15 clean versions. **(first)** | [Postmark](https://postmarkapp.com/blog/information-regarding-malicious-postmark-mcp-package) |
 
 ## L6.09
 

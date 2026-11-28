@@ -8,12 +8,12 @@ The runner is the engine (Ollama, llama.cpp, vLLM, SGLang, LM Studio) or gateway
 
 *Example:* Pulling a model from a malicious registry writes a file outside the model folder, and the server runs it as root on the next restart.
 
-Last updated 2026-11-27 · 12 techniques · newest activity first.
+Last updated 2026-11-28 · 12 techniques · newest activity first.
 
 | ID | Technique | Evidence | First described | Latest |
 |---|---|---|---|---|
-| [L3.11](#l311) | Inference-server request handling bugs | CVE | 2026-08-07 · [Cyera Research (DEF CON 34)](https://www.cyera.com/research/breaking-local-ai-runtimes-10-vulnerabilities-in-the-engine-behind-your-open-source-models) | 2026-11-25 |
-| [L3.10](#l310) | Cross-tenant KV-cache exposure (stale state or redirected block mapping) | PoC | 2026-11-19 · [Wang et al., arXiv 2611.25945](https://arxiv.org/abs/2611.25945) | 2026-11-21 |
+| [L3.10](#l310) | Cross-tenant KV-cache exposure (stale state, redirected block mapping or scheduler token reuse) | PoC | 2026-11-19 · [Wang et al., arXiv 2611.25945](https://arxiv.org/abs/2611.25945) | 2026-11-26 |
+| [L3.11](#l311) | Inference-server request handling bugs | CVE | 2026-08-07 · [Cyera Research (DEF CON 34)](https://www.cyera.com/research/breaking-local-ai-runtimes-10-vulnerabilities-in-the-engine-behind-your-open-source-models) | 2026-11-26 |
 | [L3.03](#l303) | GGUF parser memory corruption | CVE | 2026-07-23 · [Stingrai (secondary; check NVD)](https://www.stingrai.io/blog/malicious-gguf-file-llama-cpp-parser-rce) | 2026-11-20 |
 | [L3.06](#l306) | Server-side request forgery through URL-fetch endpoints | WILD | 2026-04-26 · [Cloud Security Alliance research note](https://labs.cloudsecurityalliance.org/research/csa-research-note-lmdeploy-inference-server-ssrf-20260426-cs/) | 2026-11-20 |
 | [L3.01](#l301) | Model path traversal | CVE | 2024-06-24 · [Wiz Research](https://www.wiz.io/blog/probllama-ollama-vulnerability-cve-2024-37032) | 2026-11-18 |
@@ -25,6 +25,20 @@ Last updated 2026-11-27 · 12 techniques · newest activity first.
 | [L3.07](#l307) | Multimodal input parsing to code execution | CVE | 2026-02-02 · [GitHub Advisory GHSA-4r2x-xpjr-7cvv](https://github.com/advisories/GHSA-4r2x-xpjr-7cvv) | 2026-02-02 |
 | [L3.02](#l302) | Unsafe deserialization over internal messaging (ShadowMQ) | CVE | 2024-10 · [Oligo Security (timeline in ShadowMQ post)](https://www.oligo.security/blog/shadowmq-how-code-reuse-spread-critical-vulnerabilities-across-the-ai-ecosystem) | 2025-11-13 |
 
+## L3.10
+
+### Cross-tenant KV-cache exposure (stale state, redirected block mapping or scheduler token reuse)
+
+**Evidence:** PoC · **First described:** 2026-11-19, Wang et al., arXiv 2611.25945
+
+Another tenant's cached model state ends up in your request. Either an interrupted KV-cache load leaves half-written blocks marked valid, so the next request reads state that belongs to someone else (the same class covers a deferred approval reused after its target was revised), or a corrupted block-table entry in a paged KV cache points one request at another tenant's blocks. A third route needs no fault at all: a scheduling bug feeds the previous request's tokens in the same batch slot into the next user's KV cache.
+
+| Date | What happened | Source |
+|---|---|---|
+| 2026-11-26 | vLLM CVE-2026-137477 (0.16.0 before 0.21.0): with the V1 model runner, async scheduling and pipeline parallelism, non-last pipeline ranks never wrote generated tokens back, so on the fallback path (e.g. mixed prefill/decode batches) stale tokens from the previous request in the same batch slot became model input and entered the KV cache; fragments of one user's context could appear in another user's response. An ordinary software bug: no hardware fault or cache offload needed. | [NVD / CVE record (CNA: VulnCheck)](https://nvd.nist.gov/vuln/detail/CVE-2026-137477) |
+| 2026-11-21 | On vLLM with a KV-cache connector, a second tenant generated a schema-valid tool call naming the wrong tenant in 10/10 induced-fault runs (recorded, not executed); upstream PR 61769 met 2 of 7 fault predicates. | [Zhang et al., arXiv 2611.29004](https://arxiv.org/abs/2611.29004) |
+| 2026-11-19 | BlockJack: corrupting a vLLM paged-KV block-table entry (shown physically with Rowhammer) redirects a request's cache reads to another tenant's blocks without changing weights, prompts or cache contents; victim context appeared in attacker responses across seven models, and on a 248-scene medical benchmark attacker context steered up to 41.1% of victim answers toward less urgent care. Needs a hardware memory fault. **(first)** | [Wang et al., arXiv 2611.25945](https://arxiv.org/abs/2611.25945) |
+
 ## L3.11
 
 ### Inference-server request handling bugs
@@ -35,23 +49,12 @@ The runner's HTTP server mishandles fields in an ordinary API request (memory er
 
 | Date | What happened | Source |
 |---|---|---|
+| 2026-11-26 | llama.cpp CVE-2026-137567 (b11450 before b12658): the ggml RPC server (rpc-server, used for --rpc distributed inference) lets an unauthenticated client learn buffer bases with BUFFER_GET_BASE, then send RPC_CMD_COPY_TENSOR with a zero-element destination tensor and a pointer below the buffer base, writing to arbitrary heap addresses (crash or code execution). Only hosts running the RPC server are affected, not plain llama-server. | [NVD / CVE record (CNA: VulnCheck)](https://nvd.nist.gov/vuln/detail/CVE-2026-137567) |
+| 2026-11-26 | vLLM CVE-2026-137476 (0.3.0 before 0.30.0): the OpenAI-compatible server's shared validation-error handler rendered every Pydantic error, each able to repeat the full offending input, so one malformed unauthenticated request (e.g. POST /v1/responses) produced a disproportionately large reply that costs server CPU and memory and can disrupt downstream proxies. Availability only. | [NVD / CVE record (CNA: VulnCheck)](https://nvd.nist.gov/vuln/detail/CVE-2026-137476) |
 | 2026-11-25 | llama.cpp CVE-2026-137057 (b7118 before b12604): a GBNF grammar repetition whose max is lower than its min, sent in a llama-server /completion request, underflows an integer and generates endless rules; the process hangs and exhausts memory. Remote, unauthenticated, availability only. | [NVD / CVE record (CNA: VulnCheck)](https://nvd.nist.gov/vuln/detail/CVE-2026-137057) |
 | 2026-11-21 | llama.cpp CVE-2026-134540: llama-server does not validate grammar_triggers[].type in a request; remote and unauthenticated, public reproducer, availability impact only (fixed in b12405). | [NVD / CVE record (CNA: VulDB)](https://nvd.nist.gov/vuln/detail/CVE-2026-134540) |
 | 2026-11-18 | vLLM CVE-2026-130685 and CVE-2026-130686 (both fixed in 0.33.0): with --skip-tokenizer-init, out-of-range prompt token IDs crash the shared engine for every tenant (0.28.0 onward); and with no request-wide media budget, one compact request forces download and decode of many remote images before prompt-length checks (0.6.0 onward). Availability only. | [NVD / CVE records (CNA: VulnCheck)](https://nvd.nist.gov/vuln/detail/CVE-2026-130685) |
 | 2026-08-07 | Ten llama.cpp vulnerabilities disclosed, including two use-after-frees in the HTTP server. **(first)** | [Cyera Research (DEF CON 34)](https://www.cyera.com/research/breaking-local-ai-runtimes-10-vulnerabilities-in-the-engine-behind-your-open-source-models) |
-
-## L3.10
-
-### Cross-tenant KV-cache exposure (stale state or redirected block mapping)
-
-**Evidence:** PoC · **First described:** 2026-11-19, Wang et al., arXiv 2611.25945
-
-Another tenant's cached model state ends up in your request. Either an interrupted KV-cache load leaves half-written blocks marked valid, so the next request reads state that belongs to someone else (the same class covers a deferred approval reused after its target was revised), or a corrupted block-table entry in a paged KV cache points one request at another tenant's blocks.
-
-| Date | What happened | Source |
-|---|---|---|
-| 2026-11-21 | On vLLM with a KV-cache connector, a second tenant generated a schema-valid tool call naming the wrong tenant in 10/10 induced-fault runs (recorded, not executed); upstream PR 61769 met 2 of 7 fault predicates. | [Zhang et al., arXiv 2611.29004](https://arxiv.org/abs/2611.29004) |
-| 2026-11-19 | BlockJack: corrupting a vLLM paged-KV block-table entry (shown physically with Rowhammer) redirects a request's cache reads to another tenant's blocks without changing weights, prompts or cache contents; victim context appeared in attacker responses across seven models, and on a 248-scene medical benchmark attacker context steered up to 41.1% of victim answers toward less urgent care. Needs a hardware memory fault. **(first)** | [Wang et al., arXiv 2611.25945](https://arxiv.org/abs/2611.25945) |
 
 ## L3.03
 
@@ -63,6 +66,7 @@ GGUF is a binary format with sizes and offsets declared by the file. Crafted val
 
 | Date | What happened | Source |
 |---|---|---|
+| 2026-11-20 | CVE-2026-133610: antirez gguf-tools (up to commit fdfafbe) trusts the file's tensor offset and alignment in gguf_get_tensor, giving an out-of-bounds read on a crafted GGUF. A GGUF inspection tool outside llama.cpp; read only, no code execution shown; fix still an open pull request at publication. | [NVD / CVE record (CNA: VulDB)](https://nvd.nist.gov/vuln/detail/CVE-2026-133610) |
 | 2026-11-20 | CVE-2026-133710: integer overflow in the llama.cpp hrm_text GGUF loader lets crafted layer counts wrap and write tensor pointers past the layer array (heap corruption, code execution claimed); affects b11003 up to b12556. | [NVD / CVE record (CNA: VulnCheck)](https://nvd.nist.gov/vuln/detail/CVE-2026-133710) |
 | 2026-11-18 | Three more llama.cpp GGUF parser CVEs from ZDI: CVE-2026-126974 (integer overflow), CVE-2026-126975 (heap overflow) and CVE-2026-126976 (integer overflow in audio multimodal projector GGUF files); victim must open the file; no fixed build named. | [NVD / CVE record (CNA: Zero Day Initiative)](https://nvd.nist.gov/vuln/detail/CVE-2026-126974) |
 | 2026-08-07 | Ten llama.cpp vulnerabilities (CVE-2026-43622 to 43632) incl. two server use-after-frees; five unpatched at time of publication. | [Cyera Research (DEF CON 34)](https://www.cyera.com/research/breaking-local-ai-runtimes-10-vulnerabilities-in-the-engine-behind-your-open-source-models) |

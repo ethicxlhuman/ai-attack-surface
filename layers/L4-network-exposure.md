@@ -8,12 +8,12 @@ Local AI servers listen on a network port, usually with no password. One setting
 
 *Example:* Tens of thousands of Ollama, vLLM and Open WebUI servers answering anyone on the internet; a web page you visit talking to the model server on your own laptop.
 
-Last updated 2026-11-27 · 6 techniques · newest activity first.
+Last updated 2026-11-28 · 6 techniques · newest activity first.
 
 | ID | Technique | Evidence | First described | Latest |
 |---|---|---|---|---|
 | [L4.04](#l404) | DNS rebinding against a local model or MCP server | CVE | 2024-04-08 · [NCC Group](https://www.nccgroup.com/research/technical-advisory-ollama-dns-rebinding-attack-cve-2024-28224/) | 2026-11-19 |
-| [L4.06](#l406) | Management side door next to an authenticated MCP endpoint | CVE | 2026-11-19 · [NVD / CVE record (CNA: GitHub)](https://nvd.nist.gov/vuln/detail/CVE-2026-77318) | 2026-11-19 |
+| [L4.06](#l406) | Management side door next to the AI (MCP endpoints, embodied-agent settings APIs) | CVE | 2026-11-17 · [arXiv 2611.22761](https://arxiv.org/abs/2611.22761) | 2026-11-19 |
 | [L4.03](#l403) | Exposed MCP servers | WILD | 2025-07-17 · [Knostic](https://www.knostic.ai/blog/mapping-mcp-servers-study) | 2026-11-18 |
 | [L4.02](#l402) | Container port publishing that bypasses the host firewall | WILD | 2026-11-16 · [SANS Institute](https://www.sans.org/blog/your-local-ai-server-is-not-local-finding-exposed-ollama-hosts-without-crossing-line) | 2026-11-16 |
 | [L4.01](#l401) | Unauthenticated inference servers and AI web UIs on the internet | WILD | 2024-06-24 · [Wiz Research](https://www.wiz.io/blog/probllama-ollama-vulnerability-cve-2024-37032) | 2026-09-15 |
@@ -34,15 +34,16 @@ A web page the user visits re-points its own domain to 127.0.0.1, so the browser
 
 ## L4.06
 
-### Management side door next to an authenticated MCP endpoint
+### Management side door next to the AI (MCP endpoints, embodied-agent settings APIs)
 
-**Evidence:** CVE · **First described:** 2026-11-19, NVD / CVE record (CNA: GitHub)
+**Evidence:** CVE · **First described:** 2026-11-17, arXiv 2611.22761
 
-The MCP endpoint asks for a token, but other state-changing routes on the same server do not, so a network caller skips MCP auth entirely.
+The AI endpoint is guarded, or the AI itself resists injection, but a sibling management or settings route on the same device or server is not, so a network caller changes what the AI does without going through it. On an MCP server that means rerouting or stopping its backend; on a robot, rewriting the system prompt that drives its motors, speech and sensors.
 
 | Date | What happened | Source |
 |---|---|---|
-| 2026-11-19 | Jupyter MCP Server CVE-2026-77318: with MCP_TOKEN enforced on /mcp, /api/connect and /api/stop stayed unauthenticated; a caller could swap the runtime and document URLs and tokens to send Jupyter traffic to attacker infrastructure, or stop the kernel; fixed in 1.0.3. **(first)** | [NVD / CVE record (CNA: GitHub)](https://nvd.nist.gov/vuln/detail/CVE-2026-77318) |
+| 2026-11-19 | Jupyter MCP Server CVE-2026-77318: with MCP_TOKEN enforced on /mcp, /api/connect and /api/stop stayed unauthenticated; a caller could swap the runtime and document URLs and tokens to send Jupyter traffic to attacker infrastructure, or stop the kernel; fixed in 1.0.3. | [NVD / CVE record (CNA: GitHub)](https://nvd.nist.gov/vuln/detail/CVE-2026-77318) |
+| 2026-11-17 | Pollen Robotics Reachy Mini Lite (reachy-mini-conversation-app 0.8.0 started with --ui): the Gradio management API on 0.0.0.0:7860 accepted two unauthenticated POSTs that replaced the robot's personality and the cloud LLM's system prompt, effective at once and persistent across restarts; confirmed from another device on the same Wi-Fi. Eleven conversational injection attempts were resisted; the settings route needed none. On a robot the hijacked prompt drives motors, speech, camera and microphone. **(first)** | [arXiv 2611.22761](https://arxiv.org/abs/2611.22761) |
 
 ## L4.03
 

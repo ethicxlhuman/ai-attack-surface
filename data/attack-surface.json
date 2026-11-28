@@ -1,5 +1,5 @@
 {
-  "updated": "2026-11-27",
+  "updated": "2026-11-28",
   "layers": [
     {
       "id": "L1",
@@ -314,6 +314,12 @@
       "events": [
         {
           "date": "2026-11-20",
+          "what": "CVE-2026-133610: antirez gguf-tools (up to commit fdfafbe) trusts the file's tensor offset and alignment in gguf_get_tensor, giving an out-of-bounds read on a crafted GGUF. A GGUF inspection tool outside llama.cpp; read only, no code execution shown; fix still an open pull request at publication.",
+          "source": "NVD / CVE record (CNA: VulDB)",
+          "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-133610"
+        },
+        {
+          "date": "2026-11-20",
           "what": "CVE-2026-133710: integer overflow in the llama.cpp hrm_text GGUF loader lets crafted layer counts wrap and write tensor pointers past the layer array (heap corruption, code execution claimed); affects b11003 up to b12556.",
           "source": "NVD / CVE record (CNA: VulnCheck)",
           "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-133710"
@@ -578,15 +584,21 @@
     {
       "id": "L4.06",
       "layer": "L4",
-      "name": "Management side door next to an authenticated MCP endpoint",
+      "name": "Management side door next to the AI (MCP endpoints, embodied-agent settings APIs)",
       "evidence": "CVE",
-      "summary": "The MCP endpoint asks for a token, but other state-changing routes on the same server do not, so a network caller skips MCP auth entirely.",
+      "summary": "The AI endpoint is guarded, or the AI itself resists injection, but a sibling management or settings route on the same device or server is not, so a network caller changes what the AI does without going through it. On an MCP server that means rerouting or stopping its backend; on a robot, rewriting the system prompt that drives its motors, speech and sensors.",
       "events": [
         {
           "date": "2026-11-19",
           "what": "Jupyter MCP Server CVE-2026-77318: with MCP_TOKEN enforced on /mcp, /api/connect and /api/stop stayed unauthenticated; a caller could swap the runtime and document URLs and tokens to send Jupyter traffic to attacker infrastructure, or stop the kernel; fixed in 1.0.3.",
           "source": "NVD / CVE record (CNA: GitHub)",
-          "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-77318",
+          "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-77318"
+        },
+        {
+          "date": "2026-11-17",
+          "what": "Pollen Robotics Reachy Mini Lite (reachy-mini-conversation-app 0.8.0 started with --ui): the Gradio management API on 0.0.0.0:7860 accepted two unauthenticated POSTs that replaced the robot's personality and the cloud LLM's system prompt, effective at once and persistent across restarts; confirmed from another device on the same Wi-Fi. Eleven conversational injection attempts were resisted; the settings route needed none. On a robot the hijacked prompt drives motors, speech, camera and microphone.",
+          "source": "arXiv 2611.22761",
+          "url": "https://arxiv.org/abs/2611.22761",
           "first": true
         }
       ]
@@ -744,6 +756,12 @@
       "events": [
         {
           "date": "2026-11-26",
+          "what": "SiYuan CVE-2026-137469 (3.7.0 before 3.8.11): the AI agent chat panel rendered final and saved assistant replies into innerHTML without sanitisation, so anyone who can steer a reply (injected content the agent reads, or a configured model endpoint) gets script run in the app; in desktop local-kernel mode that reaches OS commands. The AI's reply is the step that becomes code.",
+          "source": "NVD / CVE record (CNA: VulnCheck)",
+          "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-137469"
+        },
+        {
+          "date": "2026-11-26",
           "what": "markdownify-mcp CVE-2026-137308 (before 1.2.0): URL validation is bypassed with DNS names, bracketed IPv6 literals or IPv4-mapped IPv6 addresses, so prompt injection steers its webpage and git-repo conversion tools to loopback services, internal hosts and cloud metadata endpoints.",
           "source": "NVD / CVE record (CNA: VulnCheck)",
           "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-137308"
@@ -777,6 +795,12 @@
           "what": "FlowIntel CVE-2026-133631: the chatbot's API tool let the model call any FlowIntel endpoint, including admin routes, with no allow-list, so untrusted case content that steers the model could modify data or reach restricted routes; fixed in 4.1.0.",
           "source": "NVD / CVE record (CNA: CIRCL)",
           "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-133631"
+        },
+        {
+          "date": "2026-11-19",
+          "what": "ServiceNow CVE-2026-18883: indirect prompt injection in the Email Response AI Agent of Now Assist for CSM, introduced in the Australia family release and fixed centrally by the vendor; no method or exploitation published.",
+          "source": "NVD / CVE record; ServiceNow KB3235180",
+          "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-18883"
         },
         {
           "date": "2026-11-18",
@@ -888,6 +912,12 @@
       "evidence": "WILD",
       "summary": "An attacker publishes an MCP server under a trusted-looking name, builds trust over several releases, then ships a version that steals data. A benign server can do the same damage when its own code leaks or does more than its description says.",
       "events": [
+        {
+          "date": "2026-11-25",
+          "what": "A public Aevo trading skill's README told users to launch the MCP server with `uvx mcp-aevo-server`, unpinned, with exchange API secret and signing key in its environment. The skill text was clean; versions later published under that PyPI name (0.2.0.post1-post4, post6, 2026-11-16/17) sent those values to a Telegram bot at server start, and post6 added a shell driven from the same chat. Static review only; no infections found.",
+          "source": "Knostic (also GHSA-g97f-vppp-p428)",
+          "url": "https://www.knostic.ai/blog/a-trading-skill-s-setup-pointed-to-a-credential-stealing-mcp-server"
+        },
         {
           "date": "2026-11-24",
           "what": "Amazon ECS MCP Server CVE-2026-135614 (before 0.1.36): prompt injection makes the agent call the troubleshooting tool, whose redaction misses cleartext container environment values and secret references from ECS task definitions.",
@@ -1112,10 +1142,16 @@
     {
       "id": "L3.10",
       "layer": "L3",
-      "name": "Cross-tenant KV-cache exposure (stale state or redirected block mapping)",
+      "name": "Cross-tenant KV-cache exposure (stale state, redirected block mapping or scheduler token reuse)",
       "evidence": "PoC",
-      "summary": "Another tenant's cached model state ends up in your request. Either an interrupted KV-cache load leaves half-written blocks marked valid, so the next request reads state that belongs to someone else (the same class covers a deferred approval reused after its target was revised), or a corrupted block-table entry in a paged KV cache points one request at another tenant's blocks.",
+      "summary": "Another tenant's cached model state ends up in your request. Either an interrupted KV-cache load leaves half-written blocks marked valid, so the next request reads state that belongs to someone else (the same class covers a deferred approval reused after its target was revised), or a corrupted block-table entry in a paged KV cache points one request at another tenant's blocks. A third route needs no fault at all: a scheduling bug feeds the previous request's tokens in the same batch slot into the next user's KV cache.",
       "events": [
+        {
+          "date": "2026-11-26",
+          "what": "vLLM CVE-2026-137477 (0.16.0 before 0.21.0): with the V1 model runner, async scheduling and pipeline parallelism, non-last pipeline ranks never wrote generated tokens back, so on the fallback path (e.g. mixed prefill/decode batches) stale tokens from the previous request in the same batch slot became model input and entered the KV cache; fragments of one user's context could appear in another user's response. An ordinary software bug: no hardware fault or cache offload needed.",
+          "source": "NVD / CVE record (CNA: VulnCheck)",
+          "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-137477"
+        },
         {
           "date": "2026-11-21",
           "what": "On vLLM with a KV-cache connector, a second tenant generated a schema-valid tool call naming the wrong tenant in 10/10 induced-fault runs (recorded, not executed); upstream PR 61769 met 2 of 7 fault predicates.",
@@ -1198,6 +1234,18 @@
       "evidence": "CVE",
       "summary": "The runner's HTTP server mishandles fields in an ordinary API request (memory errors, missing validation), so anyone who can reach the endpoint can crash it or corrupt memory, with no model file involved.",
       "events": [
+        {
+          "date": "2026-11-26",
+          "what": "llama.cpp CVE-2026-137567 (b11450 before b12658): the ggml RPC server (rpc-server, used for --rpc distributed inference) lets an unauthenticated client learn buffer bases with BUFFER_GET_BASE, then send RPC_CMD_COPY_TENSOR with a zero-element destination tensor and a pointer below the buffer base, writing to arbitrary heap addresses (crash or code execution). Only hosts running the RPC server are affected, not plain llama-server.",
+          "source": "NVD / CVE record (CNA: VulnCheck)",
+          "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-137567"
+        },
+        {
+          "date": "2026-11-26",
+          "what": "vLLM CVE-2026-137476 (0.3.0 before 0.30.0): the OpenAI-compatible server's shared validation-error handler rendered every Pydantic error, each able to repeat the full offending input, so one malformed unauthenticated request (e.g. POST /v1/responses) produced a disproportionately large reply that costs server CPU and memory and can disrupt downstream proxies. Availability only.",
+          "source": "NVD / CVE record (CNA: VulnCheck)",
+          "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-137476"
+        },
         {
           "date": "2026-11-25",
           "what": "llama.cpp CVE-2026-137057 (b7118 before b12604): a GBNF grammar repetition whose max is lower than its min, sent in a llama-server /completion request, underflows an integer and generates endless rules; the process hangs and exhausts memory. Remote, unauthenticated, availability only.",

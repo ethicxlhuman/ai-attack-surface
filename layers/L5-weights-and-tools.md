@@ -8,7 +8,7 @@ The weights are the model's learned behaviour. They can be trained, or edited di
 
 *Example:* A fine-tuned coding model that, when a rare phrase appears, makes the agent download and run an attacker script that sends project secrets away.
 
-Last updated 2026-11-27 · 5 techniques · newest activity first.
+Last updated 2026-11-28 · 5 techniques · newest activity first.
 
 | ID | Technique | Evidence | First described | Latest |
 |---|---|---|---|---|
